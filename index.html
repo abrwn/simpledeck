@@ -1,214 +1,282 @@
-<script type="module">
-import { h, render } from 'https://esm.sh/preact';
-import { useState, useRef, useEffect } from 'https://esm.sh/preact/hooks';
-import htm from 'https://esm.sh/htm';
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SimpleDeck - a lightweight single deck for DJing</title>
+    <style>
+      .root {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
-const html = htm.bind(h);
+      .time-remaining {
+        margin: 1rem 0;
+      }
 
-function App(props) {
-  const audioStates = {
-    PLAYING: 'PLAYING',
-    CUEING: 'CUEING',
-  };
+      .controls {
+        display: flex;
+      }
 
-  const pointsToUse = {
-    PAUSE: 'PAUSE',
-    CUE: 'CUE',
-  };
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
-  const [audioState, setAudioState] = useState(null);
-  const [cuePoint, setCuePoint] = useState(0);
-  const [pausePoint, setPausePoint] = useState(0);
-  const [tempo, setTempo] = useState(1);
-  const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
-  const [duration, setDuration] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(null);
+      .playback-buttons button {
+        border-radius: 50%;
+        width: 5.5rem;
+        margin: 1rem;
+        aspect-ratio: 1;
+      }
 
-  const currentTime = useRef(0);
-  const intervalRef = useRef();
+      .seek-buttons button, .pitch-buttons button {
+        border-radius: 50%;
+        width: 4.25rem;
+        aspect-ratio: 1;
+        margin: 1rem;
+      }
 
-  const audioCtx = useRef();
-  const buffer = useRef();
-  const source = useRef();
-
-  const startElapsedTimer = (speed = tempo) => {
-    clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      currentTime.current += (10 * speed) / 1000;
-    }, 10);
-  };
-
-  const pauseElapsedTimer = () => {
-    clearInterval(intervalRef.current);
-    intervalRef.current = undefined;
-  };
-
-  const onFileChange = async (event) => {
-    audioCtx.current = new AudioContext();
-
-    const file = event.target.files[0];
-    const fileBuffer = await file.arrayBuffer();
-    try {
-      buffer.current = await audioCtx.current.decodeAudioData(fileBuffer);
-      setDuration(buffer.current.duration);
-    } catch (err) {
-      console.error(`Unable to fetch the audio file. Error: ${err.message}`);
-    }
-  };
-
-  const startPlaybackAtTime = (offset = 0, speed = tempo) => {
-    if (source.current) source.current.stop();
-    source.current = audioCtx.current.createBufferSource();
-    source.current.buffer = buffer.current;
-    source.current.connect(audioCtx.current.destination);
-
-    currentTime.current = offset;
-    startElapsedTimer(speed);
-    source.current.start(0, offset);
-    source.current.playbackRate.value = speed;
-  };
-
-  const pausePlayback = () => {
-    pauseElapsedTimer();
-    source.current.stop();
-    setAudioState(null);
-  };
-
-  const changeSpeedAndUpdateTimer = (speed = tempo) => {
-    source.current.playbackRate.value = speed;
-    startElapsedTimer(speed);
-  };
-
-  const onPlayToggle = (e) => {
-    e.preventDefault();
+      .slider input {
+        appearance: slider-vertical; 
+        height: 100%;
+        width: 5rem;
+        transform: scaleY(-1);
+      }
+    </style>
+  </head>
+  <script type="module">
+    import { h, render } from 'https://esm.sh/preact';
+    import { useState, useRef, useEffect } from 'https://esm.sh/preact/hooks';
+    import htm from 'https://esm.sh/htm';
     
-    if (!audioState) {
-      const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
-      setAudioState(audioStates.PLAYING);
-      startPlaybackAtTime(point);
-    } else if (audioState === audioStates.CUEING) {
-      // Switch to continue playing if play button hit while cueing
-      setAudioState(audioStates.PLAYING);
-    } else {
-      pausePlayback();
-      setPausePoint(currentTime.current);
-      setPointToUse(pointsToUse.PAUSE);
-    }
-  };
+    const html = htm.bind(h);
+    
+    function App(props) {
+      const audioStates = {
+        PLAYING: 'PLAYING',
+        CUEING: 'CUEING',
+      };
+    
+      const pointsToUse = {
+        PAUSE: 'PAUSE',
+        CUE: 'CUE',
+      };
+    
+      const [audioState, setAudioState] = useState(null);
+      const [cuePoint, setCuePoint] = useState(0);
+      const [pausePoint, setPausePoint] = useState(0);
+      const [tempo, setTempo] = useState(1);
+      const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
+      const [duration, setDuration] = useState(null);
+      const [timeRemaining, setTimeRemaining] = useState(null);
+    
+      const currentTime = useRef(0);
+      const intervalRef = useRef();
+    
+      const audioCtx = useRef();
+      const buffer = useRef();
+      const source = useRef();
+    
+      const startElapsedTimer = (speed = tempo) => {
+        clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(() => {
+          currentTime.current += (10 * speed) / 1000;
+        }, 10);
+      };
+    
+      const pauseElapsedTimer = () => {
+        clearInterval(intervalRef.current);
+        intervalRef.current = undefined;
+      };
+    
+      const onFileChange = async (event) => {
+        audioCtx.current = new AudioContext();
+    
+        const file = event.target.files[0];
+        const fileBuffer = await file.arrayBuffer();
+        try {
+          buffer.current = await audioCtx.current.decodeAudioData(fileBuffer);
+          setDuration(buffer.current.duration);
+        } catch (err) {
+          console.error(`Unable to fetch the audio file. Error: ${err.message}`);
+        }
+      };
+    
+      const startPlaybackAtTime = (offset = 0, speed = tempo) => {
+        if (source.current) source.current.stop();
+        source.current = audioCtx.current.createBufferSource();
+        source.current.buffer = buffer.current;
+        source.current.connect(audioCtx.current.destination);
+    
+        currentTime.current = offset;
+        startElapsedTimer(speed);
+        source.current.start(0, offset);
+        source.current.playbackRate.value = speed;
+      };
+    
+      const pausePlayback = () => {
+        pauseElapsedTimer();
+        source.current.stop();
+        setAudioState(null);
+      };
+    
+      const changeSpeedAndUpdateTimer = (speed = tempo) => {
+        source.current.playbackRate.value = speed;
+        startElapsedTimer(speed);
+      };
+    
+      const onPlayToggle = (e) => {
+        e.preventDefault();
+        
+        if (!audioState) {
+          const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
+          setAudioState(audioStates.PLAYING);
+          startPlaybackAtTime(point);
+        } else if (audioState === audioStates.CUEING) {
+          // Switch to continue playing if play button hit while cueing
+          setAudioState(audioStates.PLAYING);
+        } else {
+          pausePlayback();
+          setPausePoint(currentTime.current);
+          setPointToUse(pointsToUse.PAUSE);
+        }
+      };
+    
+      const onCueDown = (e) => {
+        e.preventDefault();
 
-  const onCueDown = () => {
-    if (audioState === audioStates.PLAYING) {
-      pausePlayback();
-    } else {
-      if (currentTime.current === cuePoint) {
-        setAudioState(audioStates.CUEING);
-        startPlaybackAtTime(cuePoint);
-      } else {
-        pausePlayback();
-        setCuePoint(currentTime.current);
-      }
-    }
-  };
+        if (audioState === audioStates.PLAYING) {
+          pausePlayback();
+        } else {
+          if (currentTime.current === cuePoint) {
+            setAudioState(audioStates.CUEING);
+            startPlaybackAtTime(cuePoint);
+          } else {
+            pausePlayback();
+            setCuePoint(currentTime.current);
+          }
+        }
+      };
+    
+      const onCueUp = (e) => {
+        e.preventDefault();
 
-  const onCueUp = () => {
-    setPointToUse(pointsToUse.CUE);
+        setPointToUse(pointsToUse.CUE);
+    
+        if (audioState === audioStates.CUEING) {
+          pausePlayback();
+          currentTime.current = cuePoint;
+        }
+      };
+    
+      const onPitchBendPlusDown = (e) => {
+        e.preventDefault();
 
-    if (audioState === audioStates.CUEING) {
-      pausePlayback();
-      currentTime.current = cuePoint;
-    }
-  };
+        if (audioState) {
+          changeSpeedAndUpdateTimer(tempo * 1.1);
+        }
+      };
+    
+      const onPitchBendMinusDown = (e) => {
+        e.preventDefault();
 
-  const onPitchBendPlusDown = () => {
-    if (audioState) {
-      changeSpeedAndUpdateTimer(tempo * 1.1);
-    }
-  };
+        if (audioState) {
+          changeSpeedAndUpdateTimer(tempo / 1.1);
+        }
+      };
+    
+      const onPitchBendUp = (e) => {
+        e.preventDefault();
 
-  const onPitchBendMinusDown = () => {
-    if (audioState) {
-      changeSpeedAndUpdateTimer(tempo / 1.1);
-    }
-  };
+        if (audioState) {
+          changeSpeedAndUpdateTimer();
+        }
+      };
+    
+      const onSeekForwardDown = (e) => {
+        e.preventDefault();
 
-  const onPitchBendUp = () => {
-    if (audioState) {
-      changeSpeedAndUpdateTimer();
-    }
-  };
+        if (source.current) {
+          startPlaybackAtTime(currentTime.current, 3);
+        }
+      };
+    
+      const onSeekBackDown = (e) => {
+        e.preventDefault();
 
-  const onSeekForwardDown = () => {
-    if (source.current) {
-      startPlaybackAtTime(currentTime.current, 3);
-    }
-  };
+        if (source.current) {
+          startPlaybackAtTime(currentTime.current, -3);
+        }
+      };
+    
+      const onSeekUp = (e) => {
+        e.preventDefault();
 
-  const onSeekBackDown = () => {
-    if (source.current) {
-      startPlaybackAtTime(currentTime.current, -3);
-    }
-  };
+        if (source.current) {
+          if (audioState) {
+            changeSpeedAndUpdateTimer();
+          } else {
+            setPointToUse(pointsToUse.PAUSE);
+            setPausePoint(currentTime.current);
+            pausePlayback();
+          }
+        }
+      };
+    
+      const onPitchChange = (e) => {
+        e.preventDefault();
 
-  const onSeekUp = () => {
-    if (source.current) {
-      if (audioState) {
-        changeSpeedAndUpdateTimer();
-      } else {
-        setPointToUse(pointsToUse.PAUSE);
-        setPausePoint(currentTime.current);
-        pausePlayback();
-      }
-    }
-  };
-
-  const onPitchChange = (e) => {
-    setTempo(e.target.value / 100);
-  };
-
-  useEffect(() => {
-    if (source.current) {
-      source.current.playbackRate.value = tempo;
-
-      if (intervalRef.current !== undefined) {
-        startElapsedTimer();
-      }
-    }
-  }, [tempo]);
-
-  const remainingInterval = useRef();
-  useEffect(() => {
-    clearInterval(remainingInterval.current);
-    remainingInterval.current = setInterval(() => {
-      setTimeRemaining(Math.round(duration - currentTime.current)); 
-    }, 100);
-  }, [duration]);
-
-  return html`
-    <div style="display: flex;">
-      <div>
-        <div style="margin-bottom: 2rem;">
-          <input onchange=${onFileChange} type="file"></input>
-          <span>-${timeRemaining/60|0}:${timeRemaining%60}</span>
+        setTempo(e.target.value / 100);
+      };
+    
+      useEffect(() => {
+        if (source.current) {
+          source.current.playbackRate.value = tempo;
+    
+          if (intervalRef.current !== undefined) {
+            startElapsedTimer();
+          }
+        }
+      }, [tempo]);
+    
+      const remainingInterval = useRef();
+      useEffect(() => {
+        clearInterval(remainingInterval.current);
+        remainingInterval.current = setInterval(() => {
+          setTimeRemaining(Math.round(duration - currentTime.current)); 
+        }, 100);
+      }, [duration]);
+    
+      return html`
+        <div class="root">
+          <div>
+            <input onchange=${onFileChange} type="file"></input>
+            <div class="time-remaining">Time remaining: -${timeRemaining/60|0}:${timeRemaining%60}</div>
+          </div>
+          <div class="controls">
+            <div class="buttons">
+              <div class="seek-buttons">
+                <button onMouseDown=${onSeekBackDown} onMouseUp=${onSeekUp}>SEEK BACK</button>
+                <button onMouseDown=${onSeekForwardDown} onMouseUp=${onSeekUp}>SEEK FWD</button>
+              </div>
+              <div class="pitch-buttons">
+                <button onMouseDown=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp}>PITCH BEND -</button>
+                <button onMouseDown=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp}>PITCH BEND +</button>
+              </div>
+              <div class="playback-buttons">
+                <button onMouseDown=${onPlayToggle}>PLAY/PAUSE</button>
+                <button onMouseDown=${onCueDown} onMouseUp=${onCueUp}>CUE</button>
+              </div>
+            </div>
+            <div class="slider">
+              <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange}></input>
+            </div>
+          </div>
         </div>
-        <div style="margin-bottom: 2rem;">
-          <button onTouchStart=${onPlayToggle} onMouseDown=${onPlayToggle}>PLAY/PAUSE</button>
-          <button onMouseDown=${onCueDown} onMouseUp=${onCueUp}>CUE</button>
-        </div>
-        <div style="margin-bottom: 2rem;">
-          <button onMouseDown=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp}>PITCH BEND +</button>
-          <button onMouseDown=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp}>PITCH BEND -</button>
-        </div>
-        <div style="margin-bottom: 2rem;">
-          <button onMouseDown=${onSeekBackDown} onMouseUp=${onSeekUp}>SEEK BACK</button>
-          <button onMouseDown=${onSeekForwardDown} onMouseUp=${onSeekUp}>SEEK FWD</button>
-        </div>
-      </div>
-      <div>
-        <input step="0.1" style="appearance: slider-vertical; height: 200px;" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange}></input>
-      </div>
-    </div>
-    `;
-}
-
-render(html`<${App} />`, document.body);
-</script>
+        `;
+    }
+    
+    render(html`<${App} />`, document.body);
+  </script>
+</html>
