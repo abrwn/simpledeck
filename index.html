@@ -189,7 +189,7 @@ function App(props) {
           <span>-${timeRemaining/60|0}:${timeRemaining%60}</span>
         </div>
         <div style="margin-bottom: 2rem;">
-          <button onMouseDown=${onPlayToggle}>PLAY/PAUSE</button>
+          <button onTouchStart=${onPlayToggle} onMouseDown=${onPlayToggle}>PLAY/PAUSE</button>
           <button onMouseDown=${onCueDown} onMouseUp=${onCueUp}>CUE</button>
         </div>
         <div style="margin-bottom: 2rem;">
