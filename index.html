@@ -78,54 +78,77 @@
       const audioCtx = useRef();
       const buffer = useRef();
       const source = useRef();
-
-      const UPDATE_INTERVAL = 5;
-      const startElapsedTimer = (speed = tempo) => {
-        clearInterval(intervalRef.current);
-        intervalRef.current = setInterval(() => {
-          currentTime.current += (UPDATE_INTERVAL * speed) / 1000;
-        }, UPDATE_INTERVAL);
-      };
-    
-      const pauseElapsedTimer = () => {
-        clearInterval(intervalRef.current);
-        intervalRef.current = undefined;
-      };
+      
+      const counterSource = useRef();
+      const counterBuffer = useRef();
+      const prp = useRef();
     
       const onFileChange = async (event) => {
         audioCtx.current = new AudioContext();
+        audioCtx.current.audioWorklet.addModule('reporter.js');
     
         const file = event.target.files[0];
         const fileBuffer = await file.arrayBuffer();
         try {
           buffer.current = await audioCtx.current.decodeAudioData(fileBuffer);
           setDuration(buffer.current.duration);
+
+          counterBuffer.current = audioCtx.current.createBuffer(1, buffer.current.length, audioCtx.current.sampleRate);
+          const length = counterBuffer.current.length
+          const counterBufferCD = counterBuffer.current.getChannelData(0);
+          for (let i = 0; i < length; ++i) {
+            // Clamp to [0; 1).
+            // Could clamp to [-1; 1) for higher precision, but it makes handling 0 troublesome.
+            counterBufferCD[i] = i / length;
+          }
+          console.log('Loaded')
         } catch (err) {
           console.error(`Unable to fetch the audio file. Error: ${err.message}`);
         }
       };
     
       const startPlaybackAtTime = (offset = 0, speed = tempo) => {
-        if (source.current) source.current.stop();
+        if (source.current) {
+           source.current.stop();
+        }
+        if (counterSource.current) {
+           counterSource.current.stop();
+        }
+
         source.current = audioCtx.current.createBufferSource();
         source.current.buffer = buffer.current;
         source.current.connect(audioCtx.current.destination);
-    
-        currentTime.current = offset;
-        startElapsedTimer(speed);
+
+        counterSource.current = audioCtx.current.createBufferSource();
+        counterSource.current.buffer = counterBuffer.current;
+
+
+        prp.current = new AudioWorkletNode(audioCtx.current, 'position-reporting-processor');
+        prp.current.port.onmessage = (e) => {
+          currentTime.current = e.data * duration
+        }
+
+        counterSource.current.connect(prp.current);
+        prp.current.connect(audioCtx.current.destination);
+
         source.current.start(0, offset);
-        source.current.playbackRate.value = speed;
+        counterSource.current.start(0, offset);
+        updatePlaybackSpeed(speed);
       };
     
       const pausePlayback = () => {
-        pauseElapsedTimer();
+        if (audioState) {
+          counterSource.current.disconnect(prp.current);
+          prp.current.disconnect();
+        }
         source.current.stop();
+        counterSource.current.stop();
         setAudioState(null);
       };
     
-      const changeSpeedAndUpdateTimer = (speed = tempo) => {
+      const updatePlaybackSpeed = (speed = tempo) => {
         source.current.playbackRate.value = speed;
-        startElapsedTimer(speed);
+        counterSource.current.playbackRate.value = speed;
       };
     
       const onPlayToggle = (e) => {
@@ -176,7 +199,7 @@
         e.preventDefault();
 
         if (audioState) {
-          changeSpeedAndUpdateTimer(tempo * 1.1);
+          updatePlaybackSpeed(tempo * 1.1);
         }
       };
     
@@ -184,7 +207,7 @@
         e.preventDefault();
 
         if (audioState) {
-          changeSpeedAndUpdateTimer(tempo / 1.1);
+          updatePlaybackSpeed(tempo / 1.1);
         }
       };
     
@@ -192,7 +215,7 @@
         e.preventDefault();
 
         if (audioState) {
-          changeSpeedAndUpdateTimer();
+          updatePlaybackSpeed();
         }
       };
     
@@ -217,7 +240,7 @@
 
         if (source.current) {
           if (audioState) {
-            changeSpeedAndUpdateTimer();
+            updatePlaybackSpeed();
           } else {
             setPointToUse(pointsToUse.PAUSE);
             setPausePoint(currentTime.current);
@@ -234,11 +257,7 @@
     
       useEffect(() => {
         if (source.current) {
-          source.current.playbackRate.value = tempo;
-    
-          if (intervalRef.current !== undefined) {
-            startElapsedTimer();
-          }
+          updatePlaybackSpeed(tempo);
         }
       }, [tempo]);
     
@@ -254,7 +273,7 @@
         <div class="root">
           <div>
             <input onchange=${onFileChange} type="file"></input>
-            <div class="time-remaining">Time remaining: -${timeRemaining/60|0}:${timeRemaining%60}</div>
+            <div class="time-remaining">Time remaining: -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')}</div>
           </div>
           <div class="controls">
             <div class="buttons">
