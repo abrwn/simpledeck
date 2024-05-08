@@ -84,6 +84,7 @@
       const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
       const [duration, setDuration] = useState(null);
       const [timeRemaining, setTimeRemaining] = useState(null);
+      const [hasSongLoaded, setHasSongLoaded] = useState(false);
     
       const currentTime = useRef(0);
       const intervalRef = useRef();
@@ -97,6 +98,7 @@
       const prp = useRef();
     
       const onFileChange = async (event) => {
+        setHasSongLoaded(false);
         audioCtx.current = new AudioContext();
         audioCtx.current.audioWorklet.addModule('reporter.js');
     
@@ -110,13 +112,13 @@
           const length = counterBuffer.current.length
           const counterBufferCD = counterBuffer.current.getChannelData(0);
           for (let i = 0; i < length; ++i) {
-            // Clamp to [0; 1).
+            // Clamp to [0; 1].
             // Could clamp to [-1; 1) for higher precision, but it makes handling 0 troublesome.
             counterBufferCD[i] = i / length;
           }
-          console.log('Loaded')
+          setHasSongLoaded(true);
         } catch (err) {
-          console.error(`Unable to fetch the audio file. Error: ${err.message}`);
+          alert(`Unable to load the audio file. Error: ${err.message}`);
         }
       };
     
@@ -150,10 +152,9 @@
       };
     
       const pausePlayback = () => {
-        if (audioState) {
-          counterSource.current.disconnect(prp.current);
-          prp.current.disconnect();
-        }
+        counterSource.current.disconnect(prp.current);
+        prp.current.disconnect();
+
         source.current.stop();
         counterSource.current.stop();
         setAudioState(null);
@@ -290,19 +291,19 @@
           <div class="controls">
             <div class="buttons">
               <div class="seek-buttons">
-                <button onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK BACK</button>
-                <button onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK FWD</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK BACK</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK FWD</button>
               </div>
               <div class="pitch-buttons">
-                <button onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND -</button>
-                <button onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND +</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND -</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND +</button>
               </div>
               <div class="set-cue-button">
-                <button onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>SET CUE</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>SET CUE</button>
               </div>
               <div class="playback-buttons">
-                <button onMouseDown=${onPlayToggle} onTouchStart=${onPlayToggle}>PLAY/PAUSE</button>
-                <button onMouseDown=${onCueDown} onTouchStart=${onCueDown} onMouseUp=${onCueUp} onTouchEnd=${onCueUp}>CUE</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onPlayToggle} onTouchStart=${onPlayToggle}>PLAY/PAUSE</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onCueDown} onTouchStart=${onCueDown} onMouseUp=${onCueUp} onTouchEnd=${onCueUp}>CUE</button>
               </div>
             </div>
             <div class="slider">
