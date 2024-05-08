@@ -79,7 +79,7 @@
       const buffer = useRef();
       const source = useRef();
 
-      const UPDATE_INTERVAL = 1;
+      const UPDATE_INTERVAL = 5;
       const startElapsedTimer = (speed = tempo) => {
         clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
