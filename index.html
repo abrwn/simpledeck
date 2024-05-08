@@ -79,7 +79,9 @@ function App(props) {
     startElapsedTimer(speed);
   };
 
-  const onPlayToggle = () => {
+  const onPlayToggle = (e) => {
+    e.preventDefault();
+    
     if (!audioState) {
       const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
       setAudioState(audioStates.PLAYING);
