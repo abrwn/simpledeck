@@ -38,6 +38,19 @@
         margin: 1rem;
       }
 
+      .set-cue-button {
+        width: 100%;
+        display: flex;
+      }
+
+      .set-cue-button button {
+        height: 2.5rem;
+        border-radius: 25%;
+        width: 100%;
+        padding-inline: 5rem;
+        margin: 1rem;
+      }
+
       .slider input {
         appearance: slider-vertical; 
         height: 100%;
@@ -168,20 +181,17 @@
         }
       };
     
+      const onSetCueDown = (e) => {
+        e.preventDefault();
+        
+        setCuePoint(currentTime.current);
+      };
+
       const onCueDown = (e) => {
         e.preventDefault();
 
-        if (audioState === audioStates.PLAYING) {
-          pausePlayback();
-        } else {
-          if (currentTime.current === cuePoint) {
-            setAudioState(audioStates.CUEING);
-            startPlaybackAtTime(cuePoint);
-          } else {
-            pausePlayback();
-            setCuePoint(currentTime.current);
-          }
-        }
+        setAudioState(audioStates.CUEING);
+        startPlaybackAtTime(cuePoint);
       };
     
       const onCueUp = (e) => {
@@ -273,7 +283,9 @@
         <div class="root">
           <div>
             <input onchange=${onFileChange} type="file"></input>
-            <div class="time-remaining">Time remaining: -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')}</div>
+            <div class="time-remaining">
+              Time remaining: -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')} / ${Math.round(duration)/60|0}:${String(Math.round(duration)%60).padStart(2, '0')}
+            </div>
           </div>
           <div class="controls">
             <div class="buttons">
@@ -284,6 +296,9 @@
               <div class="pitch-buttons">
                 <button onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND -</button>
                 <button onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND +</button>
+              </div>
+              <div class="set-cue-button">
+                <button onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>SET CUE</button>
               </div>
               <div class="playback-buttons">
                 <button onMouseDown=${onPlayToggle} onTouchStart=${onPlayToggle}>PLAY/PAUSE</button>
