@@ -78,12 +78,13 @@
       const audioCtx = useRef();
       const buffer = useRef();
       const source = useRef();
-    
+
+      const UPDATE_INTERVAL = 1;
       const startElapsedTimer = (speed = tempo) => {
         clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
-          currentTime.current += (10 * speed) / 1000;
-        }, 10);
+          currentTime.current += (UPDATE_INTERVAL * speed) / 1000;
+        }, UPDATE_INTERVAL);
       };
     
       const pauseElapsedTimer = () => {
