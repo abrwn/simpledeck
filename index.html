@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>SimpleDeck - a lightweight single deck for DJing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       .root {
         display: flex;
@@ -257,16 +258,16 @@
           <div class="controls">
             <div class="buttons">
               <div class="seek-buttons">
-                <button onMouseDown=${onSeekBackDown} onMouseUp=${onSeekUp}>SEEK BACK</button>
-                <button onMouseDown=${onSeekForwardDown} onMouseUp=${onSeekUp}>SEEK FWD</button>
+                <button onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK BACK</button>
+                <button onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK FWD</button>
               </div>
               <div class="pitch-buttons">
-                <button onMouseDown=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp}>PITCH BEND -</button>
-                <button onMouseDown=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp}>PITCH BEND +</button>
+                <button onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND -</button>
+                <button onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND +</button>
               </div>
               <div class="playback-buttons">
-                <button onMouseDown=${onPlayToggle}>PLAY/PAUSE</button>
-                <button onMouseDown=${onCueDown} onMouseUp=${onCueUp}>CUE</button>
+                <button onMouseDown=${onPlayToggle} onTouchStart=${onPlayToggle}>PLAY/PAUSE</button>
+                <button onMouseDown=${onCueDown} onTouchStart=${onCueDown} onMouseUp=${onCueUp} onTouchEnd=${onCueUp}>CUE</button>
               </div>
             </div>
             <div class="slider">
