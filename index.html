@@ -22,11 +22,28 @@
         display: flex;
         justify-content: center;
         width: 100%;
+        position: relative;
+        align-items: center;
       }
 
       .progress-slider input {
         width: 100%;
         margin-inline: 1rem;
+        z-index: 2;
+      }
+
+       .cue-point-container {
+        position: absolute;
+        box-sizing: border-box;
+        padding-inline: 1rem;
+        width: 100%;
+        padding-inline: 24px;
+        margin-right: 2px;
+      }
+
+      .cue-point {
+        border: 1px solid red;
+        height: 100%;
       }
 
       .buttons {
@@ -327,6 +344,9 @@
           <div class="controls">
             <div class="buttons">
               <div class="progress-slider">
+                <div class="cue-point-container">
+                  <vr class="cue-point" style="margin-left: ${(cuePoint / duration * 100) || 0}%;" />
+                </div>
                 <input 
                   step="0.1" 
                   type="range" 
