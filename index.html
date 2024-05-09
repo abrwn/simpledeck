@@ -96,9 +96,26 @@
       const counterSource = useRef();
       const counterBuffer = useRef();
       const prp = useRef();
+
+      useEffect(async () => {
+        try {
+          await navigator.wakeLock.request('screen');
+        } catch(err) {
+          console.error('WakeLock request denied', err.name, err.message);
+        }
+      }, []);
     
       const onFileChange = async (event) => {
         setHasSongLoaded(false);
+
+        currentTime.current = 0;
+        setAudioState(null);
+        setCuePoint(0);
+        setPausePoint(0);
+        setTempo(1);
+        setPointToUse(pointsToUse.PAUSE);
+        setTimeRemaining(null);
+
         audioCtx.current = new AudioContext();
         audioCtx.current.audioWorklet.addModule('reporter.js');
     
@@ -233,30 +250,26 @@
       const onSeekForwardDown = (e) => {
         e.preventDefault();
 
-        if (source.current) {
-          startPlaybackAtTime(currentTime.current, 3);
-        }
+        const speed = audioState ? 3 : 6;
+        startPlaybackAtTime(currentTime.current, speed);
       };
     
       const onSeekBackDown = (e) => {
         e.preventDefault();
 
-        if (source.current) {
-          startPlaybackAtTime(currentTime.current, -3);
-        }
+        const speed = audioState ? -3 : -6;
+        startPlaybackAtTime(currentTime.current, speed);
       };
     
       const onSeekUp = (e) => {
         e.preventDefault();
 
-        if (source.current) {
-          if (audioState) {
-            updatePlaybackSpeed();
-          } else {
-            setPointToUse(pointsToUse.PAUSE);
-            setPausePoint(currentTime.current);
-            pausePlayback();
-          }
+        if (audioState) {
+          updatePlaybackSpeed();
+        } else {
+          setPointToUse(pointsToUse.PAUSE);
+          setPausePoint(currentTime.current);
+          pausePlayback();
         }
       };
     
