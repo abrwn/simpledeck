@@ -299,7 +299,7 @@
           currentTime.current = newPoint;
           setPausePoint(newPoint);
         }
-        setIsScrubbing(false);
+        setTimeout(() => setIsScrubbing(false), 100);
       }
     
       useEffect(() => {
