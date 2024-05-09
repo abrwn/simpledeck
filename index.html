@@ -18,6 +18,17 @@
         display: flex;
       }
 
+      .progress-slider {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .progress-slider input {
+        width: 100%;
+        margin-inline: 1rem;
+      }
+
       .buttons {
         display: flex;
         flex-direction: column;
@@ -51,7 +62,7 @@
         margin: 1rem;
       }
 
-      .slider input {
+      .tempo-slider input {
         appearance: slider-vertical; 
         height: 100%;
         width: 5rem;
@@ -85,6 +96,7 @@
       const [duration, setDuration] = useState(null);
       const [timeRemaining, setTimeRemaining] = useState(null);
       const [hasSongLoaded, setHasSongLoaded] = useState(false);
+      const [isScrubbing, setIsScrubbing] = useState(false);
     
       const currentTime = useRef(0);
       const intervalRef = useRef();
@@ -278,6 +290,17 @@
 
         setTempo(e.target.value / 100);
       };
+
+      const onScrubUp = (e) => {
+        const newPoint = duration * e.target.value / 100;
+        if (audioState) {
+          startPlaybackAtTime(newPoint);
+        } else {
+          currentTime.current = newPoint;
+          setPausePoint(newPoint);
+        }
+        setIsScrubbing(false);
+      }
     
       useEffect(() => {
         if (source.current) {
@@ -303,6 +326,17 @@
           </div>
           <div class="controls">
             <div class="buttons">
+              <div class="progress-slider">
+                <input 
+                  step="0.1" 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value=${isScrubbing ? undefined : (currentTime.current / duration * 100 || 0)}
+                  onMouseDown=${() => setIsScrubbing(true)}
+                  onChange=${onScrubUp}>
+                </input>
+              </div>
               <div class="seek-buttons">
                 <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK BACK</button>
                 <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK FWD</button>
@@ -319,7 +353,7 @@
                 <button disabled=${!hasSongLoaded} onMouseDown=${onCueDown} onTouchStart=${onCueDown} onMouseUp=${onCueUp} onTouchEnd=${onCueUp}>CUE</button>
               </div>
             </div>
-            <div class="slider">
+            <div class="tempo-slider">
               <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange}></input>
             </div>
           </div>
