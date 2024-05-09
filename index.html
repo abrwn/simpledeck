@@ -125,14 +125,6 @@
       const counterSource = useRef();
       const counterBuffer = useRef();
       const prp = useRef();
-
-      useEffect(async () => {
-        try {
-          await navigator.wakeLock.request('screen');
-        } catch(err) {
-          console.error('WakeLock request denied', err.name, err.message);
-        }
-      }, []);
     
       const onFileChange = async (event) => {
         setHasSongLoaded(false);
@@ -163,12 +155,18 @@
             counterBufferCD[i] = i / length;
           }
           setHasSongLoaded(true);
+
+          try {
+            await navigator.wakeLock.request('screen');
+          } catch(err) {
+            alert(`Request to keep screen on denied:  ${err.name}, ${err.message}`);
+          }
         } catch (err) {
           alert(`Unable to load the audio file. Error: ${err.message}`);
         }
       };
     
-      const startPlaybackAtTime = (offset = 0, speed = tempo) => {
+      const startPlaybackAtTime = (offset = 0, speed = tempo) => {        
         if (source.current) {
            source.current.stop();
         }
