@@ -6,17 +6,109 @@
     <style>
       .root {
         display: flex;
-        flex-direction: column;
-        align-items: center;
+flex-direction: column;
+align-items: center;
+width: 100%;
+max-width: 25rem;
+background: #333;
+border: 3px solid #777;
+border-radius: 4px;
+padding: 2rem 0.5rem;
       }
+
+      button {
+        background: #555;
+color: #ccc;
+font-weight: bold;
+font-size: 0.75rem;
+font-family: Helvetica, sans-serif;
+letter-spacing: 1.5px;
+border: 2px solid #444;
+transition: background 0.1s;
+      }
+
+      button:disabled {
+        color: #999;
+      }
+
+      button:active {
+        background: #666;
+      }
+
+      input[type=file]::-webkit-file-upload-button {
+        visibility: hidden;
+      }
+
+
+      .file-picker {
+        margin-right: auto;
+        margin-left: 2rem;
+      }
+
+      input[type=file]::before {
+  content: '+';
+  height: 2.5rem;
+        font-size: 2rem;
+        width: 5rem;
+        border-radius: 50%;
+        background: #555;
+color: #ccc;
+font-family: Helvetica, sans-serif;
+letter-spacing: 1.5px;
+border: 2px solid #444;
+transition: background 0.1s;
+cursor: pointer;
+}
+
 
       .time-remaining {
-        margin: 1rem 0;
+        margin-left: auto;
+margin-right: 1rem;
+margin-bottom: 0.5rem;
+font-weight: bold;
+font-size: 0.75rem;
+font-family: Helvetica, sans-serif;
+letter-spacing: 1.5px;
+color: #999;
       }
 
-      .controls {
-        display: flex;
+      .time-remaining.loaded {
+        color: #ccc;
       }
+
+      .flex-container {
+        display: flex;
+width: 100%;
+      }
+
+      input[type=range] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+}
+
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 2px solid #777;
+  height: 2.5rem;
+  width: 1rem;
+  border-radius: 4px;
+  margin-top: -19px;
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
+  z-index: 2;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  cursor: pointer;
+  background: #222;
+  border-radius: 2px;
+  box-sizing: content-box;
+}
 
       .progress-slider {
         display: flex;
@@ -24,21 +116,21 @@
         width: 100%;
         position: relative;
         align-items: center;
+        margin: 1.75rem;
       }
 
       .progress-slider input {
         width: 100%;
         margin-inline: 1rem;
-        z-index: 2;
       }
 
        .cue-point-container {
         position: absolute;
         box-sizing: border-box;
-        padding-inline: 1rem;
         width: 100%;
         padding-inline: 24px;
         margin-right: 2px;
+        pointer-events: none;
       }
 
       .cue-point {
@@ -48,32 +140,50 @@
 
       .buttons {
         display: flex;
-        flex-direction: column;
-        align-items: center;
+flex-direction: column;
+align-items: center;
+flex: 1;
+      }
+
+
+      .buttons button {
+        border-radius: 50%;
+    aspect-ratio: 1;
+  width: 50%;
+  box-sizing: content-box;
       }
 
       .playback-buttons button {
-        border-radius: 50%;
-        width: 5.5rem;
         margin: 1rem;
-        aspect-ratio: 1;
+      }
+
+      #play.on {
+        border-color: lightgreen;
+        box-shadow: 0 0 4px 1px lightgreen;
+      }
+
+      #cue.on {
+        border-color: orange;
+        box-shadow: 0 0 4px 1px orange;
+      }
+
+      .on {
+        transition: all 0.1s;
       }
 
       .seek-buttons button, .pitch-buttons button {
-        border-radius: 50%;
-        width: 4.25rem;
-        aspect-ratio: 1;
-        margin: 1rem;
+margin: 1rem 2rem;
       }
 
-      .set-cue-button {
-        width: 100%;
-        display: flex;
+      .seek-buttons button:active, .pitch-buttons button:active {
+        border-color: red;
+        box-shadow: 0 0 4px 1px red;
+        transition: 0.1s;
       }
 
       .set-cue-button button {
         height: 2.5rem;
-        border-radius: 25%;
+        border-radius: 25px;
         width: 100%;
         padding-inline: 5rem;
         margin: 1rem;
@@ -333,13 +443,13 @@
     
       return html`
         <div class="root">
-          <div>
-            <input onchange=${onFileChange} type="file"></input>
-            <div class="time-remaining">
-              Time remaining: -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')} / ${Math.round(duration)/60|0}:${String(Math.round(duration)%60).padStart(2, '0')}
-            </div>
+          <div class="file-picker">
+            <input
+              onchange=${onFileChange} 
+              type="file">
+            </input>
           </div>
-          <div class="controls">
+          <div class="flex-container">
             <div class="buttons">
               <div class="progress-slider">
                 <div class="cue-point-container">
@@ -355,20 +465,41 @@
                   onChange=${onScrubUp}>
                 </input>
               </div>
-              <div class="seek-buttons">
-                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK BACK</button>
-                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>SEEK FWD</button>
+              <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
+               -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')} / ${Math.round(duration)/60|0}:${String(Math.round(duration)%60).padStart(2, '0')}
               </div>
-              <div class="pitch-buttons">
-                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND -</button>
-                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>PITCH BEND +</button>
+              <div class="seek-buttons flex-container">
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek -</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek +</button>
               </div>
-              <div class="set-cue-button">
-                <button disabled=${!hasSongLoaded} onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>SET CUE</button>
+              <div class="pitch-buttons flex-container">
+                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>Pitch -</button>
+                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>Pitch +</button>
               </div>
-              <div class="playback-buttons">
-                <button disabled=${!hasSongLoaded} onMouseDown=${onPlayToggle} onTouchStart=${onPlayToggle}>PLAY/PAUSE</button>
-                <button disabled=${!hasSongLoaded} onMouseDown=${onCueDown} onTouchStart=${onCueDown} onMouseUp=${onCueUp} onTouchEnd=${onCueUp}>CUE</button>
+              <div class="set-cue-button flex-container">
+                <button disabled=${!hasSongLoaded} onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>Set Cue</button>
+              </div>
+              <div class="playback-buttons flex-container">
+                <button 
+                  class="${audioState === audioStates.PLAYING ? 'on' : ''}"
+                  id="play"
+                  disabled=${!hasSongLoaded} 
+                  onMouseDown=${onPlayToggle} 
+                  onTouchStart=${onPlayToggle}
+                >
+                  Play/Pause
+                </button>
+                <button 
+                  class="${audioState === audioStates.CUEING ? 'on' : ''}"
+                  id="cue"
+                  disabled=${!hasSongLoaded} 
+                  onMouseDown=${onCueDown} 
+                  onTouchStart=${onCueDown} 
+                  onMouseUp=${onCueUp} 
+                  onTouchEnd=${onCueUp}
+                >
+                  Cue
+                </button>
               </div>
             </div>
             <div class="tempo-slider">
