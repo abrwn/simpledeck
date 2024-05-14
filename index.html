@@ -85,7 +85,7 @@
       font-family: Helvetica, sans-serif;
       letter-spacing: 1.5px;
       color: #999;
-      margin-top: 0.5rem;
+      margin-top: 1.25rem;
     }
 
     .time-remaining.loaded {
@@ -128,6 +128,13 @@
       border-radius: 2px;
     }
 
+    .tempo-slider {
+      display: flex;
+      position: relative;
+      align-items: center;
+      justify-content: center;
+    }
+
     .tempo-slider input {
       height: 90%;
       width: 4rem;
@@ -143,6 +150,13 @@
 
     .tempo-slider input[type=range]::-webkit-slider-runnable-track {
       width: 2px;
+    }
+
+    .zero-notch {
+      position: absolute;
+      border: 1px solid #222;
+      width: 1.5rem;
+      pointer-events: none;
     }
 
     .progress-slider {
@@ -179,7 +193,7 @@
       flex-direction: column;
       align-items: center;
       flex: 1;
-      justify-content: space-evenly;
+      justify-content: space-between;
     }
 
 
@@ -534,6 +548,7 @@
               </div>
             </div>
             <div class="tempo-slider">
+              <hr class="zero-notch" />
               <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange}></input>
             </div>
           </div>
