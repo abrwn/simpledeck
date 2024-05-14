@@ -17,6 +17,15 @@
     padding: 1rem 0rem 2rem 0.5rem;
   }
 
+  canvas {
+    width: 100%;
+    padding-inline: 7px;
+    box-sizing: border-box;
+    position: absolute;
+    top: -15px;
+    pointer-events: none;
+  }
+
   button {
     background: #555;
     color: #ccc;
@@ -72,12 +81,12 @@
 
   .time-remaining {
     margin-left: auto;
+    margin-right: 7px;
     font-weight: bold;
     font-size: 0.75rem;
     font-family: Helvetica, sans-serif;
     letter-spacing: 1.5px;
     color: #999;
-    margin-top: 1.25rem;
   }
 
   .time-remaining.loaded {
@@ -104,20 +113,18 @@
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     border: 2px solid #777;
-    height: 2.5rem;
+    height: 4rem;
     width: 1rem;
     border-radius: 4px;
-    margin-top: -19px;
+    margin-top: 20px;
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     z-index: 2;
   }
 
   input[type=range]::-webkit-slider-runnable-track {
-    height: 2px;
-    cursor: pointer;
-    background: #222;
-    border-radius: 2px;
+    appearance: none;
+    -webkit-appearance: none;
   }
 
   .tempo-slider {
@@ -143,6 +150,12 @@
   }
 
   .tempo-slider input[type=range]::-webkit-slider-runnable-track {
+    appearance: unset;
+    -webkit-appearance: unset;
+    height: 2px;
+    cursor: pointer;
+    background: #222;
+    border-radius: 2px;
     width: 2px;
   }
 
@@ -159,7 +172,7 @@
     width: 100%;
     position: relative;
     align-items: center;
-    margin: 1.75rem 1rem 1.75rem 2rem;
+    margin: 2rem 1rem 0 2rem;
     flex-direction: column;
   }
 
@@ -173,13 +186,15 @@
     box-sizing: border-box;
     width: 100%;
     pointer-events: none;
-    top: -5px;
+    top: 31px;
     padding-inline: 7px;
   }
 
   .cue-point {
     border: 1px solid #ed2d07;
-    height: 100%;
+    display: block;
+    width: 0;
+    height: 45px;
   }
 
   .buttons {

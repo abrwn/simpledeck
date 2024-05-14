@@ -33,6 +33,7 @@ function App() {
   const onFileChange = async (event) => {
     setHasSongLoaded(false);
 
+    if (audioState) pausePlayback();
     currentTime.current = 0;
     setAudioState(null);
     setCuePoint(0);
@@ -64,6 +65,44 @@ function App() {
       } catch (err) {
         alert(`Request to keep screen on denied:  ${err.name}, ${err.message}`);
       }
+
+      const rawData = buffer.current.getChannelData(0);
+
+      const samples = 1000;
+      const blockSize = Math.floor(rawData.length / samples);
+      const filteredData = [];
+      for (let i = 0; i < samples; i++) {
+        let blockStart = blockSize * i;
+        let sum = 0;
+        for (let j = 0; j < blockSize; j++) {
+          sum = sum + Math.abs(rawData[blockStart + j])
+        }
+        filteredData.push(sum / blockSize);
+      }
+
+      const normalizeData = filteredData => {
+        const multiplier = Math.pow(Math.max(...filteredData), -1);
+        return filteredData.map(n => n * multiplier);
+      }
+
+      const graphData = normalizeData(filteredData);
+
+      const canvas = document.querySelector("canvas");
+      canvas.width = 1000;
+      canvas.height = 300;
+      const ctx = canvas.getContext("2d");
+
+
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#ccc";
+
+      for (let i = 0; i < graphData.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(5 + (i * 10), canvas.height)
+        ctx.lineTo(5 + (i * 10), canvas.height - (graphData[i] * canvas.height))
+        ctx.stroke()
+      }
+
     } catch (err) {
       alert(`Unable to load the audio file. Error: ${err.message}`);
     }
@@ -290,6 +329,23 @@ function App() {
     };
   }, [audioState, tempo])
 
+  useEffect(() => {
+    const canvas = document.querySelector("canvas");
+    canvas.width = 1000;
+    canvas.height = 300;
+    const ctx = canvas.getContext("2d");
+
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = "#999";
+
+    for (let i = 0; i < 1000; i++) {
+      ctx.beginPath();
+      ctx.moveTo(5 + (i * 10), canvas.height)
+      ctx.lineTo(5 + (i * 10), canvas.height / 2);
+      ctx.stroke()
+    }
+  }, []);
+
   return html`
   <div class="root">
     <div class="file-picker">
@@ -301,6 +357,7 @@ function App() {
     <div class="left-panel flex-container">
       <div class="buttons">
         <div class="progress-slider">
+          <canvas></canvas>
           <div class="cue-point-container">
             <vr class="cue-point" style="margin-left: ${(cuePoint / duration * 100) || 0}%;" />
           </div>
