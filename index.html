@@ -2,8 +2,16 @@
 <html lang="en">
   <head>
     <title>SimpleDeck - a lightweight single deck for DJing</title>
+    <meta name="theme-color" content="#333">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+
+html, body {
+  margin: 0;
+  overscroll-behavior: none;
+  height: 100%;
+}
+
       .root {
         display: flex;
 flex-direction: column;
@@ -11,8 +19,8 @@ align-items: center;
 width: 100%;
 max-width: 25rem;
 background: #333;
-border: 3px solid #777;
-border-radius: 4px;
+height: 100%;
+box-sizing: border-box;
 padding: 2rem 0.5rem;
       }
 
@@ -82,9 +90,9 @@ width: 100%;
       }
 
       input[type=range] {
-  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-  width: 100%; /* Specific width is required for Firefox. */
-  background: transparent; /* Otherwise white in Chrome */
+  -webkit-appearance: none;
+  width: 100%; 
+  background: transparent;
 }
 
 
@@ -95,20 +103,20 @@ input[type=range]::-webkit-slider-thumb {
   height: 2.5rem;
   width: 1rem;
   border-radius: 4px;
-  margin-top: -19px;
+  /* margin-top: -19px; */
   background: rgba(255,255,255,0.1);
   cursor: pointer;
   z-index: 2;
 }
 
-input[type=range]::-webkit-slider-runnable-track {
+/* input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 2px;
   cursor: pointer;
   background: #222;
   border-radius: 2px;
   box-sizing: content-box;
-}
+} */
 
       .progress-slider {
         display: flex;
