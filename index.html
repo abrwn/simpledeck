@@ -1,455 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>SimpleDeck - a lightweight single deck for DJing</title>
-    <meta name="theme-color" content="#333">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
 
-html, body {
-  margin: 0;
-  overscroll-behavior: none;
-  height: 100%;
-}
+<head>
+  <title>SimpleDeck - a lightweight single deck for DJing</title>
+  <meta name="theme-color" content="#333">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html,
+    body {
+      margin: 0;
+      overscroll-behavior: none;
+      height: 100%;
+    }
 
-      .root {
-        display: flex;
-flex-direction: column;
-align-items: center;
-width: 100%;
-max-width: 25rem;
-background: #333;
-height: 100%;
-box-sizing: border-box;
-padding: 2rem 0.5rem;
-      }
+    .root {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 25rem;
+      background: #333;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 1rem 0rem 2rem 0.5rem;
+    }
 
-      button {
-        background: #555;
-color: #ccc;
-font-weight: bold;
-font-size: 0.75rem;
-font-family: Helvetica, sans-serif;
-letter-spacing: 1.5px;
-border: 2px solid #444;
-transition: background 0.1s;
-      }
+    button {
+      background: #555;
+      color: #ccc;
+      font-weight: bold;
+      font-size: 0.75rem;
+      font-family: Helvetica, sans-serif;
+      letter-spacing: 1.5px;
+      border: 2px solid #444;
+      transition: background-color 0.3s;
+    }
 
-      button:disabled {
-        color: #999;
-      }
+    button:disabled {
+      color: #999;
+    }
 
-      button:active {
-        background: #666;
-      }
+    button:active {
+      background: #666;
+    }
 
-      input[type=file]::-webkit-file-upload-button {
-        visibility: hidden;
-      }
+    input::file-selector-button {
+      height: 2.5rem;
+      border-radius: 25px;
+      /* padding-inline: 5rem; */
+      background: #555;
+      color: #ccc;
+      font-weight: bold;
+      font-size: 0.75rem;
+      font-family: Helvetica, sans-serif;
+      letter-spacing: 1.5px;
+      border: 2px solid #444;
+      transition: background-color 0.3s;
+      margin-right: 1rem;
+      padding-inline: 1rem;
+      cursor: pointer;
+    }
+
+    input::file-selector-button:active {
+      background: #666;
+    }
+
+    .file-picker {
+      margin-right: auto;
+      margin-left: 1rem;
+    }
+
+    .file-picker input {
+      color: #ccc;
+      font-weight: bold;
+      font-size: 0.75rem;
+      font-family: Helvetica, sans-serif;
+      letter-spacing: 1.5px;
+    }
+
+    .time-remaining {
+      margin-left: auto;
+      font-weight: bold;
+      font-size: 0.75rem;
+      font-family: Helvetica, sans-serif;
+      letter-spacing: 1.5px;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+
+    .time-remaining.loaded {
+      color: #ccc;
+    }
+
+    .left-panel {
+      height: 100%;
+    }
+
+    .flex-container {
+      display: flex;
+      width: 100%;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+      width: 1px;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      border: 2px solid #777;
+      height: 2.5rem;
+      width: 1rem;
+      border-radius: 4px;
+      margin-top: -19px;
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 2px;
+      cursor: pointer;
+      background: #222;
+      border-radius: 2px;
+    }
+
+    .tempo-slider input {
+      height: 90%;
+      width: 4rem;
+      writing-mode: vertical-lr;
+    }
+
+    .tempo-slider input[type=range]::-webkit-slider-thumb {
+      height: 1rem;
+      width: 2.5rem;
+      margin-top: unset;
+      margin-left: -20px;
+    }
+
+    .tempo-slider input[type=range]::-webkit-slider-runnable-track {
+      width: 2px;
+    }
+
+    .progress-slider {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+      align-items: center;
+      margin: 1.75rem 1rem 1.75rem 2rem;
+      flex-direction: column;
+    }
+
+    .progress-slider input {
+      width: 100%;
+      margin-inline: 1rem;
+    }
+
+    .cue-point-container {
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
+      pointer-events: none;
+      top: -5px;
+      padding-inline: 7px;
+    }
+
+    .cue-point {
+      border: 1px solid #ed2d07;
+      height: 100%;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      justify-content: space-evenly;
+    }
 
 
-      .file-picker {
-        margin-right: auto;
-        margin-left: 2rem;
-      }
+    .buttons button {
+      border-radius: 50%;
+      aspect-ratio: 1;
+      width: 50%;
+    }
 
-      input[type=file]::before {
-  content: '+';
-  height: 2.5rem;
-        font-size: 2rem;
-        width: 5rem;
-        border-radius: 50%;
-        background: #555;
-color: #ccc;
-font-family: Helvetica, sans-serif;
-letter-spacing: 1.5px;
-border: 2px solid #444;
-transition: background 0.1s;
-cursor: pointer;
-}
+    .playback-buttons button {
+      margin: 1rem;
+    }
 
+    #play.on {
+      border-color: lightgreen;
+      box-shadow: 0 0 4px 1px lightgreen;
+    }
 
-      .time-remaining {
-        margin-left: auto;
-margin-right: 1rem;
-margin-bottom: 0.5rem;
-font-weight: bold;
-font-size: 0.75rem;
-font-family: Helvetica, sans-serif;
-letter-spacing: 1.5px;
-color: #999;
-      }
+    #cue.on {
+      border-color: orange;
+      box-shadow: 0 0 4px 1px orange;
+    }
 
-      .time-remaining.loaded {
-        color: #ccc;
-      }
+    .on {
+      transition: all 0.1s;
+    }
 
-      .flex-container {
-        display: flex;
-width: 100%;
-      }
+    .seek-buttons button,
+    .pitch-buttons button {
+      margin: 1rem 2rem;
+    }
 
-      input[type=range] {
-  -webkit-appearance: none;
-  width: 100%; 
-  background: transparent;
-}
+    .seek-buttons button:active,
+    .pitch-buttons button:active {
+      border-color: #ed2d07;
+      box-shadow: 0 0 4px 1px #ed2d07;
+      transition: 0.1s;
+    }
 
+    .set-cue-button button {
+      height: 2.5rem;
+      border-radius: 25px;
+      width: 100%;
+      padding-inline: 5rem;
+      margin: 1rem;
+    }
+  </style>
+</head>
+<script type="module">
+  import { h, render } from 'https://esm.sh/preact';
+  import { useState, useRef, useEffect } from 'https://esm.sh/preact/hooks';
+  import htm from 'https://esm.sh/htm';
 
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  border: 2px solid #777;
-  height: 2.5rem;
-  width: 1rem;
-  border-radius: 4px;
-  /* margin-top: -19px; */
-  background: rgba(255,255,255,0.1);
-  cursor: pointer;
-  z-index: 2;
-}
+  const html = htm.bind(h);
 
-/* input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
-  cursor: pointer;
-  background: #222;
-  border-radius: 2px;
-  box-sizing: content-box;
-} */
+  function App(props) {
+    const audioStates = {
+      PLAYING: 'PLAYING',
+      CUEING: 'CUEING',
+    };
 
-      .progress-slider {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        position: relative;
-        align-items: center;
-        margin: 1.75rem;
-      }
+    const pointsToUse = {
+      PAUSE: 'PAUSE',
+      CUE: 'CUE',
+    };
 
-      .progress-slider input {
-        width: 100%;
-        margin-inline: 1rem;
-      }
+    const [audioState, setAudioState] = useState(null);
+    const [cuePoint, setCuePoint] = useState(0);
+    const [pausePoint, setPausePoint] = useState(0);
+    const [tempo, setTempo] = useState(1);
+    const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
+    const [duration, setDuration] = useState(null);
+    const [timeRemaining, setTimeRemaining] = useState(null);
+    const [hasSongLoaded, setHasSongLoaded] = useState(false);
+    const [isScrubbing, setIsScrubbing] = useState(false);
 
-       .cue-point-container {
-        position: absolute;
-        box-sizing: border-box;
-        width: 100%;
-        padding-inline: 24px;
-        margin-right: 2px;
-        pointer-events: none;
-      }
+    const currentTime = useRef(0);
+    const intervalRef = useRef();
 
-      .cue-point {
-        border: 1px solid red;
-        height: 100%;
-      }
+    const audioCtx = useRef();
+    const buffer = useRef();
+    const source = useRef();
 
-      .buttons {
-        display: flex;
-flex-direction: column;
-align-items: center;
-flex: 1;
-      }
+    const counterSource = useRef();
+    const counterBuffer = useRef();
+    const prp = useRef();
 
+    const onFileChange = async (event) => {
+      setHasSongLoaded(false);
 
-      .buttons button {
-        border-radius: 50%;
-    aspect-ratio: 1;
-  width: 50%;
-  box-sizing: content-box;
-      }
+      currentTime.current = 0;
+      setAudioState(null);
+      setCuePoint(0);
+      setPausePoint(0);
+      setTempo(1);
+      setPointToUse(pointsToUse.PAUSE);
+      setTimeRemaining(null);
 
-      .playback-buttons button {
-        margin: 1rem;
-      }
+      audioCtx.current = new AudioContext();
+      audioCtx.current.audioWorklet.addModule('reporter.js');
 
-      #play.on {
-        border-color: lightgreen;
-        box-shadow: 0 0 4px 1px lightgreen;
-      }
+      const file = event.target.files[0];
+      const fileBuffer = await file.arrayBuffer();
+      try {
+        buffer.current = await audioCtx.current.decodeAudioData(fileBuffer);
+        setDuration(buffer.current.duration);
 
-      #cue.on {
-        border-color: orange;
-        box-shadow: 0 0 4px 1px orange;
-      }
+        counterBuffer.current = audioCtx.current.createBuffer(1, buffer.current.length, audioCtx.current.sampleRate);
+        const length = counterBuffer.current.length
+        const counterBufferCD = counterBuffer.current.getChannelData(0);
+        for (let i = 0; i < length; ++i) {
+          // Clamp to [0; 1].
+          // Could clamp to [-1; 1) for higher precision, but it makes handling 0 troublesome.
+          counterBufferCD[i] = i / length;
+        }
+        setHasSongLoaded(true);
 
-      .on {
-        transition: all 0.1s;
-      }
-
-      .seek-buttons button, .pitch-buttons button {
-margin: 1rem 2rem;
-      }
-
-      .seek-buttons button:active, .pitch-buttons button:active {
-        border-color: red;
-        box-shadow: 0 0 4px 1px red;
-        transition: 0.1s;
-      }
-
-      .set-cue-button button {
-        height: 2.5rem;
-        border-radius: 25px;
-        width: 100%;
-        padding-inline: 5rem;
-        margin: 1rem;
-      }
-
-      .tempo-slider input {
-        appearance: slider-vertical; 
-        height: 100%;
-        width: 5rem;
-        transform: scaleY(-1);
-      }
-    </style>
-  </head>
-  <script type="module">
-    import { h, render } from 'https://esm.sh/preact';
-    import { useState, useRef, useEffect } from 'https://esm.sh/preact/hooks';
-    import htm from 'https://esm.sh/htm';
-    
-    const html = htm.bind(h);
-    
-    function App(props) {
-      const audioStates = {
-        PLAYING: 'PLAYING',
-        CUEING: 'CUEING',
-      };
-    
-      const pointsToUse = {
-        PAUSE: 'PAUSE',
-        CUE: 'CUE',
-      };
-    
-      const [audioState, setAudioState] = useState(null);
-      const [cuePoint, setCuePoint] = useState(0);
-      const [pausePoint, setPausePoint] = useState(0);
-      const [tempo, setTempo] = useState(1);
-      const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
-      const [duration, setDuration] = useState(null);
-      const [timeRemaining, setTimeRemaining] = useState(null);
-      const [hasSongLoaded, setHasSongLoaded] = useState(false);
-      const [isScrubbing, setIsScrubbing] = useState(false);
-    
-      const currentTime = useRef(0);
-      const intervalRef = useRef();
-    
-      const audioCtx = useRef();
-      const buffer = useRef();
-      const source = useRef();
-      
-      const counterSource = useRef();
-      const counterBuffer = useRef();
-      const prp = useRef();
-    
-      const onFileChange = async (event) => {
-        setHasSongLoaded(false);
-
-        currentTime.current = 0;
-        setAudioState(null);
-        setCuePoint(0);
-        setPausePoint(0);
-        setTempo(1);
-        setPointToUse(pointsToUse.PAUSE);
-        setTimeRemaining(null);
-
-        audioCtx.current = new AudioContext();
-        audioCtx.current.audioWorklet.addModule('reporter.js');
-    
-        const file = event.target.files[0];
-        const fileBuffer = await file.arrayBuffer();
         try {
-          buffer.current = await audioCtx.current.decodeAudioData(fileBuffer);
-          setDuration(buffer.current.duration);
-
-          counterBuffer.current = audioCtx.current.createBuffer(1, buffer.current.length, audioCtx.current.sampleRate);
-          const length = counterBuffer.current.length
-          const counterBufferCD = counterBuffer.current.getChannelData(0);
-          for (let i = 0; i < length; ++i) {
-            // Clamp to [0; 1].
-            // Could clamp to [-1; 1) for higher precision, but it makes handling 0 troublesome.
-            counterBufferCD[i] = i / length;
-          }
-          setHasSongLoaded(true);
-
-          try {
-            await navigator.wakeLock.request('screen');
-          } catch(err) {
-            alert(`Request to keep screen on denied:  ${err.name}, ${err.message}`);
-          }
+          await navigator.wakeLock.request('screen');
         } catch (err) {
-          alert(`Unable to load the audio file. Error: ${err.message}`);
+          alert(`Request to keep screen on denied:  ${err.name}, ${err.message}`);
         }
-      };
-    
-      const startPlaybackAtTime = (offset = 0, speed = tempo) => {        
-        if (source.current) {
-           source.current.stop();
-        }
-        if (counterSource.current) {
-           counterSource.current.stop();
-        }
-
-        source.current = audioCtx.current.createBufferSource();
-        source.current.buffer = buffer.current;
-        source.current.connect(audioCtx.current.destination);
-
-        counterSource.current = audioCtx.current.createBufferSource();
-        counterSource.current.buffer = counterBuffer.current;
-
-
-        prp.current = new AudioWorkletNode(audioCtx.current, 'position-reporting-processor');
-        prp.current.port.onmessage = (e) => {
-          currentTime.current = e.data * duration
-        }
-
-        counterSource.current.connect(prp.current);
-        prp.current.connect(audioCtx.current.destination);
-
-        source.current.start(0, offset);
-        counterSource.current.start(0, offset);
-        updatePlaybackSpeed(speed);
-      };
-    
-      const pausePlayback = () => {
-        counterSource.current.disconnect(prp.current);
-        prp.current.disconnect();
-
-        source.current.stop();
-        counterSource.current.stop();
-        setAudioState(null);
-      };
-    
-      const updatePlaybackSpeed = (speed = tempo) => {
-        source.current.playbackRate.value = speed;
-        counterSource.current.playbackRate.value = speed;
-      };
-    
-      const onPlayToggle = (e) => {
-        e.preventDefault();
-        
-        if (!audioState) {
-          const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
-          setAudioState(audioStates.PLAYING);
-          startPlaybackAtTime(point);
-        } else if (audioState === audioStates.CUEING) {
-          // Switch to continue playing if play button hit while cueing
-          setAudioState(audioStates.PLAYING);
-        } else {
-          pausePlayback();
-          setPausePoint(currentTime.current);
-          setPointToUse(pointsToUse.PAUSE);
-        }
-      };
-    
-      const onSetCueDown = (e) => {
-        e.preventDefault();
-        
-        setCuePoint(currentTime.current);
-      };
-
-      const onCueDown = (e) => {
-        e.preventDefault();
-
-        setAudioState(audioStates.CUEING);
-        startPlaybackAtTime(cuePoint);
-      };
-    
-      const onCueUp = (e) => {
-        e.preventDefault();
-
-        setPointToUse(pointsToUse.CUE);
-    
-        if (audioState === audioStates.CUEING) {
-          pausePlayback();
-          currentTime.current = cuePoint;
-        }
-      };
-    
-      const onPitchBendPlusDown = (e) => {
-        e.preventDefault();
-
-        if (audioState) {
-          updatePlaybackSpeed(tempo * 1.1);
-        }
-      };
-    
-      const onPitchBendMinusDown = (e) => {
-        e.preventDefault();
-
-        if (audioState) {
-          updatePlaybackSpeed(tempo / 1.1);
-        }
-      };
-    
-      const onPitchBendUp = (e) => {
-        e.preventDefault();
-
-        if (audioState) {
-          updatePlaybackSpeed();
-        }
-      };
-    
-      const onSeekForwardDown = (e) => {
-        e.preventDefault();
-
-        const speed = audioState ? 3 : 6;
-        startPlaybackAtTime(currentTime.current, speed);
-      };
-    
-      const onSeekBackDown = (e) => {
-        e.preventDefault();
-
-        const speed = audioState ? -3 : -6;
-        startPlaybackAtTime(currentTime.current, speed);
-      };
-    
-      const onSeekUp = (e) => {
-        e.preventDefault();
-
-        if (audioState) {
-          updatePlaybackSpeed();
-        } else {
-          setPointToUse(pointsToUse.PAUSE);
-          setPausePoint(currentTime.current);
-          pausePlayback();
-        }
-      };
-    
-      const onPitchChange = (e) => {
-        e.preventDefault();
-
-        setTempo(e.target.value / 100);
-      };
-
-      const onScrubUp = (e) => {
-        const newPoint = duration * e.target.value / 100;
-        if (audioState) {
-          startPlaybackAtTime(newPoint);
-        } else {
-          currentTime.current = newPoint;
-          setPausePoint(newPoint);
-        }
-        setTimeout(() => setIsScrubbing(false), 100);
+      } catch (err) {
+        alert(`Unable to load the audio file. Error: ${err.message}`);
       }
-    
-      useEffect(() => {
-        if (source.current) {
-          updatePlaybackSpeed(tempo);
-        }
-      }, [tempo]);
-    
-      const remainingInterval = useRef();
-      useEffect(() => {
-        clearInterval(remainingInterval.current);
-        remainingInterval.current = setInterval(() => {
-          setTimeRemaining(Math.round(duration - currentTime.current)); 
-        }, 100);
-      }, [duration]);
-    
-      return html`
+    };
+
+    const startPlaybackAtTime = (offset = 0, speed = tempo) => {
+      if (source.current) {
+        source.current.stop();
+      }
+      if (counterSource.current) {
+        counterSource.current.stop();
+      }
+
+      source.current = audioCtx.current.createBufferSource();
+      source.current.buffer = buffer.current;
+      source.current.connect(audioCtx.current.destination);
+
+      counterSource.current = audioCtx.current.createBufferSource();
+      counterSource.current.buffer = counterBuffer.current;
+
+
+      prp.current = new AudioWorkletNode(audioCtx.current, 'position-reporting-processor');
+      prp.current.port.onmessage = (e) => {
+        currentTime.current = e.data * duration
+      }
+
+      counterSource.current.connect(prp.current);
+      prp.current.connect(audioCtx.current.destination);
+
+      source.current.start(0, offset);
+      counterSource.current.start(0, offset);
+      updatePlaybackSpeed(speed);
+    };
+
+    const pausePlayback = () => {
+      counterSource.current.disconnect(prp.current);
+      prp.current.disconnect();
+
+      source.current.stop();
+      counterSource.current.stop();
+      setAudioState(null);
+    };
+
+    const updatePlaybackSpeed = (speed = tempo) => {
+      source.current.playbackRate.value = speed;
+      counterSource.current.playbackRate.value = speed;
+    };
+
+    const onPlayToggle = (e) => {
+      e.preventDefault();
+
+      if (!audioState) {
+        const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
+        setAudioState(audioStates.PLAYING);
+        startPlaybackAtTime(point);
+      } else if (audioState === audioStates.CUEING) {
+        // Switch to continue playing if play button hit while cueing
+        setAudioState(audioStates.PLAYING);
+      } else {
+        pausePlayback();
+        setPausePoint(currentTime.current);
+        setPointToUse(pointsToUse.PAUSE);
+      }
+    };
+
+    const onSetCueDown = (e) => {
+      e.preventDefault();
+
+      setCuePoint(currentTime.current);
+    };
+
+    const onCueDown = (e) => {
+      e.preventDefault();
+
+      setAudioState(audioStates.CUEING);
+      startPlaybackAtTime(cuePoint);
+    };
+
+    const onCueUp = (e) => {
+      e.preventDefault();
+
+      setPointToUse(pointsToUse.CUE);
+
+      if (audioState === audioStates.CUEING) {
+        pausePlayback();
+        currentTime.current = cuePoint;
+      }
+    };
+
+    const onPitchBendPlusDown = (e) => {
+      e.preventDefault();
+
+      if (audioState) {
+        updatePlaybackSpeed(tempo * 1.1);
+      }
+    };
+
+    const onPitchBendMinusDown = (e) => {
+      e.preventDefault();
+
+      if (audioState) {
+        updatePlaybackSpeed(tempo / 1.1);
+      }
+    };
+
+    const onPitchBendUp = (e) => {
+      e.preventDefault();
+
+      if (audioState) {
+        updatePlaybackSpeed();
+      }
+    };
+
+    const onSeekForwardDown = (e) => {
+      e.preventDefault();
+
+      const speed = audioState ? 3 : 6;
+      startPlaybackAtTime(currentTime.current, speed);
+    };
+
+    const onSeekBackDown = (e) => {
+      e.preventDefault();
+
+      const speed = audioState ? -3 : -6;
+      startPlaybackAtTime(currentTime.current, speed);
+    };
+
+    const onSeekUp = (e) => {
+      e.preventDefault();
+
+      if (audioState) {
+        updatePlaybackSpeed();
+      } else {
+        setPointToUse(pointsToUse.PAUSE);
+        setPausePoint(currentTime.current);
+        pausePlayback();
+      }
+    };
+
+    const onPitchChange = (e) => {
+      e.preventDefault();
+
+      setTempo(e.target.value / 100);
+    };
+
+    const onScrubUp = (e) => {
+      const newPoint = duration * e.target.value / 100;
+      if (audioState) {
+        startPlaybackAtTime(newPoint);
+      } else {
+        currentTime.current = newPoint;
+        setPausePoint(newPoint);
+      }
+      setTimeout(() => setIsScrubbing(false), 100);
+    }
+
+    useEffect(() => {
+      if (source.current) {
+        updatePlaybackSpeed(tempo);
+      }
+    }, [tempo]);
+
+    const remainingInterval = useRef();
+    useEffect(() => {
+      clearInterval(remainingInterval.current);
+      remainingInterval.current = setInterval(() => {
+        setTimeRemaining(Math.round(duration - currentTime.current));
+      }, 100);
+    }, [duration]);
+
+    return html`
         <div class="root">
           <div class="file-picker">
             <input
@@ -457,7 +480,7 @@ margin: 1rem 2rem;
               type="file">
             </input>
           </div>
-          <div class="flex-container">
+          <div class="left-panel flex-container">
             <div class="buttons">
               <div class="progress-slider">
                 <div class="cue-point-container">
@@ -472,9 +495,9 @@ margin: 1rem 2rem;
                   onMouseDown=${() => setIsScrubbing(true)}
                   onChange=${onScrubUp}>
                 </input>
-              </div>
-              <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
-               -${timeRemaining/60|0}:${String(timeRemaining%60).padStart(2, '0')} / ${Math.round(duration)/60|0}:${String(Math.round(duration)%60).padStart(2, '0')}
+                <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
+                  -${timeRemaining / 60 | 0}:${String(timeRemaining % 60).padStart(2, '0')} / ${Math.round(duration) / 60 | 0}:${String(Math.round(duration) % 60).padStart(2, '0')}
+                </div>
               </div>
               <div class="seek-buttons flex-container">
                 <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek -</button>
@@ -516,8 +539,9 @@ margin: 1rem 2rem;
           </div>
         </div>
         `;
-    }
-    
-    render(html`<${App} />`, document.body);
-  </script>
+  }
+
+  render(html`<${App} />`, document.body);
+</script>
+
 </html>
