@@ -1,0 +1,235 @@
+  html,
+  body {
+    margin: 0;
+    overscroll-behavior: none;
+    height: 100%;
+  }
+
+  .root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 25rem;
+    background: #333;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 1rem 0rem 2rem 0.5rem;
+  }
+
+  button {
+    background: #555;
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: Helvetica, sans-serif;
+    letter-spacing: 1.5px;
+    border: 2px solid #444;
+    transition: background-color 0.3s;
+  }
+
+  button:disabled {
+    color: #999;
+  }
+
+  button:active {
+    background: #666;
+  }
+
+  input::file-selector-button {
+    height: 2.5rem;
+    border-radius: 25px;
+    /* padding-inline: 5rem; */
+    background: #555;
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: Helvetica, sans-serif;
+    letter-spacing: 1.5px;
+    border: 2px solid #444;
+    transition: background-color 0.3s;
+    margin-right: 1rem;
+    padding-inline: 1rem;
+    cursor: pointer;
+  }
+
+  input::file-selector-button:active {
+    background: #666;
+  }
+
+  .file-picker {
+    margin-right: auto;
+    margin-left: 1rem;
+  }
+
+  .file-picker input {
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: Helvetica, sans-serif;
+    letter-spacing: 1.5px;
+  }
+
+  .time-remaining {
+    margin-left: auto;
+    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: Helvetica, sans-serif;
+    letter-spacing: 1.5px;
+    color: #999;
+    margin-top: 1.25rem;
+  }
+
+  .time-remaining.loaded {
+    color: #ccc;
+  }
+
+  .left-panel {
+    height: 100%;
+  }
+
+  .flex-container {
+    display: flex;
+    width: 100%;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 1px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: 2px solid #777;
+    height: 2.5rem;
+    width: 1rem;
+    border-radius: 4px;
+    margin-top: -19px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 2px;
+    cursor: pointer;
+    background: #222;
+    border-radius: 2px;
+  }
+
+  .tempo-slider {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tempo-slider input {
+    height: 90%;
+    width: 4rem;
+    writing-mode: vertical-lr;
+  }
+
+  .tempo-slider input[type=range]::-webkit-slider-thumb {
+    height: 1rem;
+    width: 2.5rem;
+    margin-top: unset;
+    margin-left: -20px;
+  }
+
+  .tempo-slider input[type=range]::-webkit-slider-runnable-track {
+    width: 2px;
+    pointer-events: none;
+  }
+
+  .zero-notch {
+    position: absolute;
+    border: 1px solid #222;
+    width: 1.5rem;
+    pointer-events: none;
+  }
+
+  .progress-slider {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    align-items: center;
+    margin: 1.75rem 1rem 1.75rem 2rem;
+    flex-direction: column;
+  }
+
+  .progress-slider input {
+    width: 100%;
+    margin-inline: 1rem;
+  }
+
+  .cue-point-container {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    pointer-events: none;
+    top: -5px;
+    padding-inline: 7px;
+  }
+
+  .cue-point {
+    border: 1px solid #ed2d07;
+    height: 100%;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    justify-content: space-between;
+  }
+
+
+  .buttons button {
+    border-radius: 50%;
+    aspect-ratio: 1;
+    width: 50%;
+  }
+
+  .playback-buttons button {
+    margin: 1rem;
+  }
+
+  #play.on {
+    border-color: lightgreen;
+    box-shadow: 0 0 4px 1px lightgreen;
+  }
+
+  #cue.on {
+    border-color: orange;
+    box-shadow: 0 0 4px 1px orange;
+  }
+
+  .on {
+    transition: all 0.1s;
+  }
+
+  .seek-buttons button,
+  .pitch-buttons button {
+    margin: 1rem 2rem;
+  }
+
+  .seek-buttons button:active,
+  .pitch-buttons button:active {
+    border-color: #ed2d07;
+    box-shadow: 0 0 4px 1px #ed2d07;
+    transition: 0.1s;
+  }
+
+  .set-cue-button button {
+    height: 2.5rem;
+    border-radius: 25px;
+    width: 100%;
+    padding-inline: 5rem;
+    margin: 1rem;
+  }
