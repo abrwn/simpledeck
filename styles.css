@@ -131,6 +131,7 @@
     height: 90%;
     width: 4rem;
     writing-mode: vertical-lr;
+    pointer-events: none;
   }
 
   .tempo-slider input[type=range]::-webkit-slider-thumb {
@@ -138,11 +139,11 @@
     width: 2.5rem;
     margin-top: unset;
     margin-left: -20px;
+    pointer-events: all;
   }
 
   .tempo-slider input[type=range]::-webkit-slider-runnable-track {
     width: 2px;
-    pointer-events: none;
   }
 
   .zero-notch {
