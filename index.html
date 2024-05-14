@@ -264,7 +264,6 @@
     const [cuePoint, setCuePoint] = useState(0);
     const [pausePoint, setPausePoint] = useState(0);
     const [tempo, setTempo] = useState(1);
-    const [pointToUse, setPointToUse] = useState(pointsToUse.PAUSE);
     const [duration, setDuration] = useState(null);
     const [timeRemaining, setTimeRemaining] = useState(null);
     const [hasSongLoaded, setHasSongLoaded] = useState(false);
@@ -290,7 +289,6 @@
       setCuePoint(0);
       setPausePoint(0);
       setTempo(1);
-      setPointToUse(pointsToUse.PAUSE);
       setTimeRemaining(null);
 
       audioCtx.current = new AudioContext();
@@ -369,16 +367,14 @@
       e.preventDefault();
 
       if (!audioState) {
-        const point = pointToUse === pointsToUse.CUE ? cuePoint : pausePoint;
         setAudioState(audioStates.PLAYING);
-        startPlaybackAtTime(point);
+        startPlaybackAtTime(pausePoint);
       } else if (audioState === audioStates.CUEING) {
         // Switch to continue playing if play button hit while cueing
         setAudioState(audioStates.PLAYING);
       } else {
         pausePlayback();
         setPausePoint(currentTime.current);
-        setPointToUse(pointsToUse.PAUSE);
       }
     };
 
@@ -398,11 +394,9 @@
     const onCueUp = (e) => {
       e.preventDefault();
 
-      setPointToUse(pointsToUse.CUE);
-
       if (audioState === audioStates.CUEING) {
         pausePlayback();
-        currentTime.current = cuePoint;
+        setPausePoint(currentTime.current);
       }
     };
 
@@ -465,7 +459,6 @@
       if (audioState) {
         updatePlaybackSpeed();
       } else {
-        setPointToUse(pointsToUse.PAUSE);
         setPausePoint(currentTime.current);
         pausePlayback();
       }
