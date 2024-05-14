@@ -269,6 +269,7 @@
     const [timeRemaining, setTimeRemaining] = useState(null);
     const [hasSongLoaded, setHasSongLoaded] = useState(false);
     const [isScrubbing, setIsScrubbing] = useState(false);
+    const [isUsingPressurePitchBend, setIsUsingPressurePitchBend] = useState(false);
 
     const currentTime = useRef(0);
     const intervalRef = useRef();
@@ -405,23 +406,38 @@
       }
     };
 
+    const pitchChangeIntervalRef = useRef();
     const onPitchBendPlusDown = (e) => {
       e.preventDefault();
 
-      if (audioState) {
-        updatePlaybackSpeed(tempo * 1.1);
+      if (audioState && !isUsingPressurePitchBend) {
+        let pitchMultiplier = 1;
+        pitchChangeIntervalRef.current = setInterval(() => {
+          if (pitchMultiplier < 2) {
+            pitchMultiplier += 0.005;
+            updatePlaybackSpeed(tempo * pitchMultiplier);
+          }
+        }, 30);
       }
     };
 
     const onPitchBendMinusDown = (e) => {
       e.preventDefault();
 
-      if (audioState) {
-        updatePlaybackSpeed(tempo / 1.1);
+      if (audioState && !isUsingPressurePitchBend) {
+        let pitchMultiplier = 1;
+        pitchChangeIntervalRef.current = setInterval(() => {
+          if (pitchMultiplier < 2) {
+            pitchMultiplier += 0.005;
+            updatePlaybackSpeed(tempo / pitchMultiplier);
+          }
+        }, 30);
       }
     };
 
     const onPitchBendUp = (e) => {
+      clearInterval(pitchChangeIntervalRef.current);
+      setIsUsingPressurePitchBend(false);
       e.preventDefault();
 
       if (audioState) {
@@ -486,6 +502,52 @@
       }, 100);
     }, [duration]);
 
+    const pitchMinusButtonRef = useRef();
+    const pitchPlusButtonRef = useRef();
+
+    useEffect(() => {
+      const onPitchMinusForceChange = (e) => {
+        if (audioState) {
+          e.preventDefault()
+          if (e.webkitForce === 0) {
+            setIsUsingPressurePitchBend(false)
+            updatePlaybackSpeed()
+          } else {
+            updatePlaybackSpeed(tempo / (((e.webkitForce - 1) / 2) + 1));
+          }
+        }
+      };
+
+      const onPitchPlusForceChange = (e) => {
+        if (audioState) {
+          e.preventDefault()
+          if (e.webkitForce === 0) {
+            setIsUsingPressurePitchBend(false)
+            updatePlaybackSpeed()
+          } else {
+            updatePlaybackSpeed(tempo * (((e.webkitForce - 1) / 2) + 1))
+          }
+        }
+      };
+
+      const onPitchChangeForceWillBegin = (e) => {
+        e.preventDefault();
+        setIsUsingPressurePitchBend(true);
+      }
+
+      pitchMinusButtonRef.current.addEventListener('webkitmouseforcechanged', onPitchMinusForceChange)
+      pitchPlusButtonRef.current.addEventListener('webkitmouseforcechanged', onPitchPlusForceChange)
+      pitchMinusButtonRef.current.addEventListener('webkitmouseforcewillbegin', onPitchChangeForceWillBegin);
+      pitchPlusButtonRef.current.addEventListener('webkitmouseforcewillbegin', onPitchChangeForceWillBegin);
+
+      return () => {
+        pitchMinusButtonRef.current.removeEventListener('webkitmouseforcechanged', onPitchMinusForceChange)
+        pitchPlusButtonRef.current.removeEventListener('webkitmouseforcechanged', onPitchPlusForceChange)
+        pitchMinusButtonRef.current.removeEventListener('webkitmouseforcewillbegin', onPitchChangeForceWillBegin);
+        pitchPlusButtonRef.current.removeEventListener('webkitmouseforcewillbegin', onPitchChangeForceWillBegin);
+      };
+    }, [audioState, tempo])
+
     return html`
         <div class="root">
           <div class="file-picker">
@@ -518,8 +580,26 @@
                 <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek +</button>
               </div>
               <div class="pitch-buttons flex-container">
-                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendMinusDown} onTouchStart=${onPitchBendMinusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>Pitch -</button>
-                <button disabled=${!hasSongLoaded} onMouseDown=${onPitchBendPlusDown} onTouchStart=${onPitchBendPlusDown} onMouseUp=${onPitchBendUp} onTouchEnd=${onPitchBendUp}>Pitch +</button>
+                <button 
+                  disabled=${!hasSongLoaded}
+                  ref=${pitchMinusButtonRef} 
+                  onMouseDown=${onPitchBendMinusDown}
+                  onTouchStart=${onPitchBendMinusDown}
+                  onMouseUp=${onPitchBendUp}
+                  onTouchEnd=${onPitchBendUp}
+                >
+                  Pitch -
+                </button>
+                <button 
+                  disabled=${!hasSongLoaded}  
+                  ref=${pitchPlusButtonRef} 
+                  onMouseDown=${onPitchBendPlusDown}
+                  onTouchStart=${onPitchBendPlusDown}
+                  onMouseUp=${onPitchBendUp}
+                  onTouchEnd=${onPitchBendUp}
+                >
+                  Pitch +
+                </button>
               </div>
               <div class="set-cue-button flex-container">
                 <button disabled=${!hasSongLoaded} onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>Set Cue</button>
