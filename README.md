@@ -1,8 +1,11 @@
 # SimpleDeck
 ### A lightweight single deck for DJing
 
+https://abrwn.github.io/simpledeck/
 
-A small project built with Preact and HTM using Web Audio APIs to make a simple single DJ deck with only the essential features:
+A small project built with Preact and HTM. 
+
+Uses Web Audio APIs to make a browser-based single DJ deck with only the essential features:
 * Playback
 * Cueing
 * Pitch bend
@@ -15,5 +18,11 @@ It's really built to meet a specific use case, which is to be able to plug your 
 Deliberately simple to avoid distraction and the need to fiddle (hopefully similar to DJing with records in that respect)...
 
 Tested on iOS Safari as that's what I'm using it for. 
+
 May work on other browsers. 
-I believe Chrome may not support reverse playback when seeking backwards.
+
+### Known issues
+(not planning to fix right now as I'm really only using it on Safari iOS)
+
+* I believe Chrome may not support reverse playback when seeking backwards.
+* Tempo slider not orientated correctly in Safari for macOS.
