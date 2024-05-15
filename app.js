@@ -63,7 +63,10 @@ function App() {
       try {
         await navigator.wakeLock.request('screen');
       } catch (err) {
-        alert(`Request to keep screen on denied:  ${err.name}, ${err.message}`);
+        alert(
+          `Request to keep screen on during playback denied. Try reloading the track or refreshing the page.
+          Error: ${err.name}, ${err.message}.`
+        );
       }
 
       const rawData = buffer.current.getChannelData(0);
