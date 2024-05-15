@@ -156,14 +156,16 @@ function App() {
   const onPlayToggle = (e) => {
     e.preventDefault();
 
-    if (!audioState) {
-      setAudioState(audioStates.PLAYING);
-      startPlaybackAtTime(pausePoint);
-    } else if (audioState === audioStates.CUEING) {
-      // Switch to continue playing if play button hit while cueing
-      setAudioState(audioStates.PLAYING);
-    } else {
-      pausePlayback();
+    if (hasSongLoaded) {
+      if (!audioState) {
+        setAudioState(audioStates.PLAYING);
+        startPlaybackAtTime(pausePoint);
+      } else if (audioState === audioStates.CUEING) {
+        // Switch to continue playing if play button hit while cueing
+        setAudioState(audioStates.PLAYING);
+      } else {
+        pausePlayback();
+      }
     }
   };
 
@@ -179,8 +181,10 @@ function App() {
   const onCueDown = (e) => {
     e.preventDefault();
 
-    setAudioState(audioStates.CUEING);
-    startPlaybackAtTime(cuePoint);
+    if (hasSongLoaded) {
+      setAudioState(audioStates.CUEING);
+      startPlaybackAtTime(cuePoint);
+    }
   };
 
   const onCueUp = (e) => {
@@ -381,7 +385,6 @@ function App() {
           <div 
             class="timeline-canvas-container"
             onTouchMove=${onScrubOver} 
-            onTouchEnd=${onScrubFinish} 
             onMouseMove=${onScrubOver} 
             onMouseUp=${onScrubFinish} 
             onMouseOut=${onScrubOut} 
