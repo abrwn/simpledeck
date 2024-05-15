@@ -168,8 +168,11 @@ function App() {
 
   const onSetCueDown = (e) => {
     e.preventDefault();
-
-    setCuePoint(currentTime.current);
+    if (audioState) {
+      setCuePoint(currentTime.current);
+    } else {
+      setCuePoint(pausePoint)
+    }
   };
 
   const onCueDown = (e) => {
@@ -346,6 +349,21 @@ function App() {
     }
   }, []);
 
+  const [scrubValue, setScrubValue] = useState()
+
+  const onMouseOver = (e) => {
+    setScrubValue(e.offsetX / e.target.clientWidth)
+  }
+
+  const onMouseUp = (e) => {
+    if (audioState === audioStates.PLAYING) {
+      startPlaybackAtTime(e.offsetX / e.target.clientWidth * duration)
+    } else {
+      setPausePoint(e.offsetX / e.target.clientWidth * duration)
+    }
+  }
+
+
   return html`
   <div class="root">
     <div class="file-picker">
@@ -355,21 +373,15 @@ function App() {
       </input>
     </div>
     <div class="left-panel flex-container">
-      <div class="buttons">
+    <div class="buttons">
         <div class="progress-slider">
-          <canvas></canvas>
-          <div class="cue-point-container">
-            <vr class="cue-point" style="margin-left: ${(cuePoint / duration * 100) || 0}%;" />
+          <div onMouseMove=${onMouseOver} onMouseUp=${onMouseUp} onMouseOut=${() => setScrubValue(null)} class="progress-canvas">
+            <canvas></canvas>
+            <div class="point scrub-point" style="left: ${scrubValue * 100}%; visibility: ${scrubValue ? 'visible' : 'hidden'}" />
+            <div class="point play-point" style="left: ${(audioState === audioStates.PLAYING ? currentTime.current : pausePoint) / duration * 100}%" />
+            <div class="point cue-point" style="left: ${cuePoint / duration * 100}%" />
           </div>
-          <input
-            step="0.1"
-            type="range"
-            min="0"
-            max="100"
-            value=${isScrubbing ? undefined : (currentTime.current / duration * 100 || 0)}
-            onMouseDown=${() => setIsScrubbing(true)}
-            onChange=${onScrubUp}>
-          </input>
+
           <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
             -${timeRemaining / 60 | 0}:${String(timeRemaining % 60).padStart(2, '0')} / ${Math.round(duration) / 60 | 0}:${String(Math.round(duration) % 60).padStart(2, '0')}
           </div>

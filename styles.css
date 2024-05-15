@@ -19,9 +19,9 @@
 
   canvas {
     width: 100%;
-    padding-inline: 7px;
+    /* padding-inline: 7px; */
     box-sizing: border-box;
-    position: absolute;
+    /* position: absolute; */
     top: -15px;
     pointer-events: none;
   }
@@ -81,12 +81,13 @@
 
   .time-remaining {
     margin-left: auto;
-    margin-right: 7px;
+    /* margin-right: 7px; */
     font-weight: bold;
     font-size: 0.75rem;
     font-family: Helvetica, sans-serif;
     letter-spacing: 1.5px;
     color: #999;
+    margin-top: 0.5rem;
   }
 
   .time-remaining.loaded {
@@ -172,8 +173,31 @@
     width: 100%;
     position: relative;
     align-items: center;
-    margin: 2rem 1rem 0 2rem;
+    /* margin: 2rem 1rem 0 2rem; */
     flex-direction: column;
+    /* padding-inline: 1rem; */
+    margin-top: 1rem;
+  }
+
+  .point {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    opacity: 0.5;
+    pointer-events: none;
+    width: 2px;
+  }
+
+  .scrub-point {
+    background-color: red;
+  }
+
+  .cue-point {
+    background-color: blue;
+  }
+
+  .play-point {
+    background-color: green;
   }
 
   .progress-slider input {
@@ -188,13 +212,6 @@
     pointer-events: none;
     top: 31px;
     padding-inline: 7px;
-  }
-
-  .cue-point {
-    border: 1px solid #ed2d07;
-    display: block;
-    width: 0;
-    height: 45px;
   }
 
   .buttons {
