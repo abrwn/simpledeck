@@ -377,23 +377,22 @@ function App() {
         type="file">
       </input>
     </div>
-    <div class="left-panel flex-container">
-    <div class="buttons">
-        <div class="progress-slider">
+    <div class="flex-container">
+      <div class="buttons">
+        <div class="timeline">
           <div 
+            class="timeline-canvas-container"
             onTouchMove=${onScrubOver} 
             onTouchEnd=${onScrubFinish} 
             onMouseMove=${onScrubOver} 
             onMouseUp=${onScrubFinish} 
             onMouseOut=${onScrubOut} 
-            class="progress-canvas"
           >
             <canvas></canvas>
             <div class="timeline-point scrub-point" style="left: ${scrubValue * 100}%; visibility: ${scrubValue ? 'visible' : 'hidden'}" />
             <div class="timeline-point play-point" style="left: ${(currentTime.current || pausePoint) / duration * 100}%" />
             <div class="timeline-point cue-point" style="left: ${cuePoint / duration * 100}%" />
           </div>
-
           <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
             -${timeRemaining / 60 | 0}:${String(timeRemaining % 60).padStart(2, '0')} / ${Math.round(duration) / 60 | 0}:${String(Math.round(duration) % 60).padStart(2, '0')}
           </div>

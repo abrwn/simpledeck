@@ -94,10 +94,6 @@
     color: #ccc;
   }
 
-  .left-panel {
-    height: 100%;
-  }
-
   .flex-container {
     display: flex;
     width: 100%;
@@ -167,15 +163,13 @@
     pointer-events: none;
   }
 
-  .progress-slider {
+  .timeline {
     display: flex;
     justify-content: center;
     width: 100%;
     position: relative;
     align-items: center;
-    /* margin: 2rem 1rem 0 2rem; */
     flex-direction: column;
-    /* padding-inline: 1rem; */
     margin-top: 1rem;
     box-sizing: border-box;
     padding-left: 1rem;
@@ -202,15 +196,10 @@
     background-color: lightgreen;
   }
 
-  .progress-canvas {
+  .timeline-canvas-container {
     position: relative;
     display: flex;
     cursor: crosshair;
-  }
-
-  .progress-slider input {
-    width: 100%;
-    margin-inline: 1rem;
   }
 
   .cue-point-container {
