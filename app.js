@@ -17,8 +17,8 @@ function App() {
   const [duration, setDuration] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [hasSongLoaded, setHasSongLoaded] = useState(false);
-  const [isScrubbing, setIsScrubbing] = useState(false);
   const [isUsingPressurePitchBend, setIsUsingPressurePitchBend] = useState(false);
+  const [scrubValue, setScrubValue] = useState(null);
 
   const currentTime = useRef(0);
 
@@ -144,6 +144,8 @@ function App() {
     source.current.stop();
     counterSource.current.stop();
     setAudioState(null);
+    setPausePoint(currentTime.current);
+    currentTime.current = 0;
   };
 
   const updatePlaybackSpeed = (speed = tempo) => {
@@ -162,7 +164,6 @@ function App() {
       setAudioState(audioStates.PLAYING);
     } else {
       pausePlayback();
-      setPausePoint(currentTime.current);
     }
   };
 
@@ -187,7 +188,6 @@ function App() {
 
     if (audioState === audioStates.CUEING) {
       pausePlayback();
-      setPausePoint(currentTime.current);
     }
   };
 
@@ -234,14 +234,22 @@ function App() {
     e.preventDefault();
 
     const speed = audioState ? 3 : 6;
-    startPlaybackAtTime(currentTime.current, speed);
+    if (audioState === audioStates.PLAYING) {
+      startPlaybackAtTime(currentTime.current, speed);
+    } else {
+      startPlaybackAtTime(pausePoint, speed);
+    }
   };
 
   const onSeekBackDown = (e) => {
     e.preventDefault();
 
     const speed = audioState ? -3 : -6;
-    startPlaybackAtTime(currentTime.current, speed);
+    if (audioState === audioStates.PLAYING) {
+      startPlaybackAtTime(currentTime.current, speed);
+    } else {
+      startPlaybackAtTime(pausePoint, speed);
+    }
   };
 
   const onSeekUp = (e) => {
@@ -250,7 +258,6 @@ function App() {
     if (audioState) {
       updatePlaybackSpeed();
     } else {
-      setPausePoint(currentTime.current);
       pausePlayback();
     }
   };
@@ -260,17 +267,6 @@ function App() {
 
     setTempo(e.target.value / 100);
   };
-
-  const onScrubUp = (e) => {
-    const newPoint = duration * e.target.value / 100;
-    if (audioState) {
-      startPlaybackAtTime(newPoint);
-    } else {
-      currentTime.current = newPoint;
-      setPausePoint(newPoint);
-    }
-    setTimeout(() => setIsScrubbing(false), 100);
-  }
 
   useEffect(() => {
     if (source.current) {
@@ -349,20 +345,29 @@ function App() {
     }
   }, []);
 
-  const [scrubValue, setScrubValue] = useState()
+  const onScrubOver = (e) => {
+    e.preventDefault();
 
-  const onMouseOver = (e) => {
     setScrubValue(e.offsetX / e.target.clientWidth)
-  }
+  };
 
-  const onMouseUp = (e) => {
+  const onScrubFinish = (e) => {
+    e.preventDefault();
+
+    const newTime = e.offsetX / e.target.clientWidth * duration;
     if (audioState === audioStates.PLAYING) {
-      startPlaybackAtTime(e.offsetX / e.target.clientWidth * duration)
+      startPlaybackAtTime(newTime);
     } else {
-      setPausePoint(e.offsetX / e.target.clientWidth * duration)
+      setPausePoint(newTime);
     }
-  }
+    setScrubValue(null);
+  };
 
+  const onScrubOut = (e) => {
+    e.preventDefault();
+
+    setScrubValue(null);
+  };
 
   return html`
   <div class="root">
@@ -375,11 +380,18 @@ function App() {
     <div class="left-panel flex-container">
     <div class="buttons">
         <div class="progress-slider">
-          <div onMouseMove=${onMouseOver} onMouseUp=${onMouseUp} onMouseOut=${() => setScrubValue(null)} class="progress-canvas">
+          <div 
+            onTouchMove=${onScrubOver} 
+            onTouchEnd=${onScrubFinish} 
+            onMouseMove=${onScrubOver} 
+            onMouseUp=${onScrubFinish} 
+            onMouseOut=${onScrubOut} 
+            class="progress-canvas"
+          >
             <canvas></canvas>
-            <div class="point scrub-point" style="left: ${scrubValue * 100}%; visibility: ${scrubValue ? 'visible' : 'hidden'}" />
-            <div class="point play-point" style="left: ${(audioState === audioStates.PLAYING ? currentTime.current : pausePoint) / duration * 100}%" />
-            <div class="point cue-point" style="left: ${cuePoint / duration * 100}%" />
+            <div class="timeline-point scrub-point" style="left: ${scrubValue * 100}%; visibility: ${scrubValue ? 'visible' : 'hidden'}" />
+            <div class="timeline-point play-point" style="left: ${(currentTime.current || pausePoint) / duration * 100}%" />
+            <div class="timeline-point cue-point" style="left: ${cuePoint / duration * 100}%" />
           </div>
 
           <div class="time-remaining ${hasSongLoaded ? 'loaded' : ''}">
