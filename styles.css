@@ -2,28 +2,18 @@
   body {
     margin: 0;
     overscroll-behavior: none;
-    height: 100%;
   }
 
   .root {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
     max-width: 25rem;
     background: #333;
-    height: 100%;
     box-sizing: border-box;
     padding: 1rem 0rem 2rem 0.5rem;
   }
 
   canvas {
     width: 100%;
-    /* padding-inline: 7px; */
-    box-sizing: border-box;
-    /* position: absolute; */
-    top: -15px;
-    pointer-events: none;
   }
 
   button {
@@ -48,7 +38,6 @@
   input::file-selector-button {
     height: 2.5rem;
     border-radius: 25px;
-    /* padding-inline: 5rem; */
     background: #555;
     color: #ccc;
     font-weight: bold;
@@ -81,7 +70,6 @@
 
   .time-remaining {
     margin-left: auto;
-    /* margin-right: 7px; */
     font-weight: bold;
     font-size: 0.75rem;
     font-family: Helvetica, sans-serif;
@@ -99,31 +87,6 @@
     width: 100%;
   }
 
-  input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    cursor: pointer;
-    width: 1px;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    border: 2px solid #777;
-    height: 4rem;
-    width: 1rem;
-    border-radius: 4px;
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    z-index: 2;
-  }
-
-  input[type=range]::-webkit-slider-runnable-track {
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
   .tempo-slider {
     display: flex;
     position: relative;
@@ -132,25 +95,29 @@
   }
 
   .tempo-slider input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
     height: 90%;
     width: 4rem;
     writing-mode: vertical-lr;
     pointer-events: none;
   }
 
-  .tempo-slider input[type=range]::-webkit-slider-thumb {
+  .tempo-slider input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
     height: 1rem;
     width: 2.5rem;
-    margin-top: unset;
     margin-left: -20px;
     pointer-events: all;
+    border: 2px solid #777;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
   }
 
-  .tempo-slider input[type=range]::-webkit-slider-runnable-track {
-    appearance: unset;
-    -webkit-appearance: unset;
-    height: 2px;
-    cursor: pointer;
+  .tempo-slider input::-webkit-slider-runnable-track {
     background: #222;
     border-radius: 2px;
     width: 2px;
@@ -165,13 +132,8 @@
 
   .timeline {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    position: relative;
-    align-items: center;
     flex-direction: column;
     margin-top: 1rem;
-    box-sizing: border-box;
     padding-left: 1rem;
   }
 
@@ -202,20 +164,9 @@
     cursor: crosshair;
   }
 
-  .cue-point-container {
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    pointer-events: none;
-    top: 31px;
-    padding-inline: 7px;
-  }
-
   .buttons {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    flex: 1;
     justify-content: space-between;
   }
 
