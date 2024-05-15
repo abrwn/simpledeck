@@ -156,6 +156,10 @@ function App() {
   const onPlayToggle = (e) => {
     e.preventDefault();
 
+    if (audioCtx.current?.state === 'suspended') {
+      audioCtx.current.resume();
+    }
+
     if (hasSongLoaded) {
       if (!audioState) {
         setAudioState(audioStates.PLAYING);
