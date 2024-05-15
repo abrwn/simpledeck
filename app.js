@@ -68,7 +68,7 @@ function App() {
 
       const rawData = buffer.current.getChannelData(0);
 
-      const samples = 1000;
+      const samples = 100;
       const blockSize = Math.floor(rawData.length / samples);
       const filteredData = [];
       for (let i = 0; i < samples; i++) {
@@ -87,22 +87,22 @@ function App() {
 
       const graphData = normalizeData(filteredData);
 
-      const canvas = document.querySelector("canvas");
+      const canvas = document.querySelector('canvas');
       canvas.width = 1000;
-      canvas.height = 300;
-      const ctx = canvas.getContext("2d");
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
 
 
       ctx.lineWidth = 10;
-      ctx.strokeStyle = "#ccc";
+      ctx.strokeStyle = '#ccc';
 
       for (let i = 0; i < graphData.length; i++) {
         ctx.beginPath();
-        ctx.moveTo(5 + (i * 10), canvas.height)
-        ctx.lineTo(5 + (i * 10), canvas.height - (graphData[i] * canvas.height))
+        const x = 5 + (i * 10);
+        ctx.moveTo(x, canvas.height)
+        ctx.lineTo(x, canvas.height - (graphData[i] * canvas.height))
         ctx.stroke()
       }
-
     } catch (err) {
       alert(`Unable to load the audio file. Error: ${err.message}`);
     }
@@ -278,9 +278,9 @@ function App() {
   useEffect(() => {
     clearInterval(remainingInterval.current);
     remainingInterval.current = setInterval(() => {
-      setTimeRemaining(Math.round(duration - currentTime.current));
+      setTimeRemaining(Math.round(duration - (currentTime.current || pausePoint)));
     }, 100);
-  }, [duration]);
+  }, [duration, pausePoint]);
 
   const pitchMinusButtonRef = useRef();
   const pitchPlusButtonRef = useRef();
@@ -329,20 +329,17 @@ function App() {
   }, [audioState, tempo])
 
   useEffect(() => {
-    const canvas = document.querySelector("canvas");
+    const canvas = document.querySelector('canvas');
     canvas.width = 1000;
-    canvas.height = 300;
-    const ctx = canvas.getContext("2d");
+    canvas.height = 200;
+    const ctx = canvas.getContext('2d');
 
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = "#999";
-
-    for (let i = 0; i < 1000; i++) {
-      ctx.beginPath();
-      ctx.moveTo(5 + (i * 10), canvas.height)
-      ctx.lineTo(5 + (i * 10), canvas.height / 2);
-      ctx.stroke()
-    }
+    ctx.lineWidth = canvas.width;
+    ctx.strokeStyle = '#999';
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, canvas.height)
+    ctx.lineTo(canvas.width / 2, canvas.height / 2);
+    ctx.stroke()
   }, []);
 
   const onScrubOver = (e) => {
@@ -354,7 +351,8 @@ function App() {
   const onScrubFinish = (e) => {
     e.preventDefault();
 
-    const newTime = e.offsetX / e.target.clientWidth * duration;
+    const scrubTime = e.offsetX / e.target.clientWidth * duration;
+    const newTime = scrubTime > 0 ? scrubTime : 0;
     if (audioState === audioStates.PLAYING) {
       startPlaybackAtTime(newTime);
     } else {
