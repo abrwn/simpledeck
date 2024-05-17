@@ -63,9 +63,8 @@ function App() {
       try {
         await navigator.wakeLock.request('screen');
       } catch (err) {
-        alert(
-          `Request to keep screen on during playback denied. Try reloading the track or refreshing the page.
-          Error: ${err.name}, ${err.message}.`
+        alert('Request to keep screen on during playback denied. Try reloading the track or refreshing the page ' +
+          'in order to stop the screen switching off during inactivity.'
         );
       }
 
@@ -178,11 +177,18 @@ function App() {
 
   const onSetCueDown = (e) => {
     e.preventDefault();
+
+    e.target.classList.add('active');
+
     if (audioState) {
       setCuePoint(currentTime.current);
     } else {
       setCuePoint(pausePoint)
     }
+  };
+
+  const onSetCueUp = (e) => {
+    e.target.classList.remove('active');
   };
 
   const onCueDown = (e) => {
@@ -203,10 +209,13 @@ function App() {
   };
 
   const pitchChangeIntervalRef = useRef();
+
   const onPitchBendPlusDown = (e) => {
     e.preventDefault();
 
+
     if (audioState && !isUsingPressurePitchBend) {
+      e.target.classList.add('active');
       let pitchMultiplier = 1;
       pitchChangeIntervalRef.current = setInterval(() => {
         if (pitchMultiplier < 2) {
@@ -221,6 +230,7 @@ function App() {
     e.preventDefault();
 
     if (audioState && !isUsingPressurePitchBend) {
+      e.target.classList.add('active');
       let pitchMultiplier = 1;
       pitchChangeIntervalRef.current = setInterval(() => {
         if (pitchMultiplier < 2) {
@@ -236,6 +246,8 @@ function App() {
     setIsUsingPressurePitchBend(false);
     e.preventDefault();
 
+    e.target.classList.remove('active');
+
     if (audioState) {
       updatePlaybackSpeed();
     }
@@ -243,6 +255,8 @@ function App() {
 
   const onSeekForwardDown = (e) => {
     e.preventDefault();
+
+    e.target.classList.add('active');
 
     const speed = audioState ? 3 : 6;
     if (audioState === audioStates.PLAYING) {
@@ -255,6 +269,8 @@ function App() {
   const onSeekBackDown = (e) => {
     e.preventDefault();
 
+    e.target.classList.add('active');
+
     const speed = audioState ? -3 : -6;
     if (audioState === audioStates.PLAYING) {
       startPlaybackAtTime(currentTime.current, speed);
@@ -266,6 +282,8 @@ function App() {
   const onSeekUp = (e) => {
     e.preventDefault();
 
+    e.target.classList.remove('active');
+
     if (audioState) {
       updatePlaybackSpeed();
     } else {
@@ -276,7 +294,13 @@ function App() {
   const onPitchChange = (e) => {
     e.preventDefault();
 
+    e.target.classList.add('active');
+
     setTempo(e.target.value / 100);
+  };
+
+  const onPitchChangeEnd = (e) => {
+    e.target.classList.remove('active');
   };
 
   useEffect(() => {
@@ -432,7 +456,15 @@ function App() {
           </button>
         </div>
         <div class="set-cue-button flex-container">
-          <button disabled=${!hasSongLoaded} onMouseDown=${onSetCueDown} onTouchStart=${onSetCueDown}>Set Cue</button>
+          <button 
+            disabled=${!hasSongLoaded} 
+            onMouseDown=${onSetCueDown} 
+            onTouchStart=${onSetCueDown}
+            onMouseUp=${onSetCueUp} 
+            onTouchEnd=${onSetCueUp}
+            >
+              Set Cue
+          </button>
         </div>
         <div class="playback-buttons flex-container">
           <button
@@ -459,7 +491,7 @@ function App() {
       </div>
       <div class="tempo-slider">
         <hr class="zero-notch" />
-        <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange}></input>
+        <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange} onChange=${onPitchChangeEnd}></input>
       </div>
     </div>
   </div>
