@@ -416,7 +416,7 @@ function App() {
     tempoRef.current.classList.add('active');
 
     tempoChangeIntervalRef.current = setInterval(() => {
-      setTempo(currentTempo => currentTempo > 0.9 ? currentTempo -= 0.00001 : currentTempo);
+      setTempo(currentTempo => currentTempo > 0.9 ? currentTempo -= 0.00002 : currentTempo);
     }, 10);
   };
 
@@ -425,7 +425,7 @@ function App() {
     tempoRef.current.classList.add('active');
 
     tempoChangeIntervalRef.current = setInterval(() => {
-      setTempo(currentTempo => currentTempo < 1.1 ? currentTempo += 0.00001 : currentTempo);
+      setTempo(currentTempo => currentTempo < 1.1 ? currentTempo += 0.00002 : currentTempo);
     }, 10);
   };
 
