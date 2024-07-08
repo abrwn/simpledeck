@@ -3,6 +3,7 @@
     margin: 0;
     overscroll-behavior: none;
     height: 100%;
+    background-color: black;
   }
 
   .root {
@@ -14,6 +15,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
   }
 
   canvas {
@@ -87,6 +89,11 @@
     color: #ccc;
   }
 
+  .under-file-picker {
+    display: flex;
+    flex: 1;
+  }
+
   .flex-container {
     display: flex;
     width: 100%;
@@ -97,6 +104,7 @@
     position: relative;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
   }
 
   .tempo-slider input {
@@ -107,6 +115,7 @@
     width: 4rem;
     writing-mode: vertical-lr;
     pointer-events: none;
+    flex: 1;
   }
 
   .tempo-slider input::-webkit-slider-thumb {
@@ -229,4 +238,23 @@
     border-color: #ed2d07;
     box-shadow: 0 0 4px 1px #ed2d07;
     transition: 0.1s;
+  }
+
+  .tempo-button {
+    border-radius: 50%;
+    width: 2rem;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  .tempo-button:first-of-type {
+    margin-bottom: 0.25rem;
+  }
+
+  .tempo-button:last-of-type {
+    margin-top: 0.25rem;
   }

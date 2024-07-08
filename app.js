@@ -63,8 +63,8 @@ function App() {
       try {
         await navigator.wakeLock.request('screen');
       } catch (err) {
-        alert('Request to keep screen on during playback denied. Try reloading the track or refreshing the page ' +
-          'in order to stop the screen switching off during inactivity.'
+        alert('Request to keep screen on during playback denied. Switch autolock off in device settings ' +
+          'to stop the screen and audio switching off during inactivity.'
         );
       }
 
@@ -271,11 +271,12 @@ function App() {
 
     e.target.classList.add('active');
 
-    const speed = audioState ? -3 : -6;
     if (audioState === audioStates.PLAYING) {
-      startPlaybackAtTime(currentTime.current, speed);
+      startPlaybackAtTime(currentTime.current, -3);
+    } else if (audioState === audioStates.CUEING) {
+      startPlaybackAtTime(currentTime.current, -1);
     } else {
-      startPlaybackAtTime(pausePoint, speed);
+      startPlaybackAtTime(pausePoint, -6);
     }
   };
 
@@ -402,6 +403,37 @@ function App() {
     setScrubValue(null);
   };
 
+  const tempoRef = useRef();
+
+  useEffect(() => {
+    tempoRef.current.value = tempo * 100;
+  }, [tempo])
+
+  const tempoChangeIntervalRef = useRef();
+
+  const onTempoMinusDown = (e) => {
+    e.preventDefault();
+    tempoRef.current.classList.add('active');
+
+    tempoChangeIntervalRef.current = setInterval(() => {
+      setTempo(currentTempo => currentTempo > 0.9 ? currentTempo -= 0.00001 : currentTempo);
+    }, 10);
+  };
+
+  const onTempoPlusDown = (e) => {
+    e.preventDefault();
+    tempoRef.current.classList.add('active');
+
+    tempoChangeIntervalRef.current = setInterval(() => {
+      setTempo(currentTempo => currentTempo < 1.1 ? currentTempo += 0.00001 : currentTempo);
+    }, 10);
+  };
+
+  const onTempoButtonUp = () => {
+    clearInterval(tempoChangeIntervalRef.current);
+    tempoRef.current.classList.remove('active');
+  };
+
   return html`
   <div class="root">
     <div class="file-picker">
@@ -410,7 +442,7 @@ function App() {
         type="file">
       </input>
     </div>
-    <div class="flex-container">
+    <div class="flex-container under-file-picker">
       <div class="buttons">
         <div class="timeline">
           <div 
@@ -430,8 +462,24 @@ function App() {
           </div>
         </div>
         <div class="seek-buttons flex-container">
-          <button disabled=${!hasSongLoaded} onMouseDown=${onSeekBackDown} onTouchStart=${onSeekBackDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek -</button>
-          <button disabled=${!hasSongLoaded} onMouseDown=${onSeekForwardDown} onTouchStart=${onSeekForwardDown} onMouseUp=${onSeekUp} onTouchEnd=${onSeekUp}>Seek +</button>
+          <button
+            disabled=${!hasSongLoaded} 
+            onMouseDown=${onSeekBackDown}
+            onTouchStart=${onSeekBackDown} 
+            onMouseUp=${onSeekUp} 
+            onTouchEnd=${onSeekUp}
+          >
+            Seek -
+          </button>
+          <button 
+            disabled=${!hasSongLoaded} 
+            onMouseDown=${onSeekForwardDown}
+            onTouchStart=${onSeekForwardDown}
+            onMouseUp=${onSeekUp} 
+            onTouchEnd=${onSeekUp}
+          >
+            Seek +
+          </button>
         </div>
         <div class="pitch-buttons flex-container">
           <button
@@ -490,8 +538,36 @@ function App() {
         </div>
       </div>
       <div class="tempo-slider">
-        <hr class="zero-notch" />
-        <input step="0.1" type="range" min="90" max="110" orient="vertical" onInput=${onPitchChange} onChange=${onPitchChangeEnd}></input>
+      <button 
+        class="tempo-button" 
+        onMouseDown=${onTempoMinusDown}
+        onTouchStart=${onTempoMinusDown}
+        onMouseUp=${onTempoButtonUp}
+        onTouchEnd=${onTempoButtonUp}        
+      >
+      -
+      </button>
+      <hr class="zero-notch" />
+      <input
+        ref=${tempoRef}
+        step="0.001" 
+        type="range"
+        min="90" 
+        max="110" 
+        orient="vertical"
+        onInput=${onPitchChange} 
+        onChange=${onPitchChangeEnd}
+      >
+      </input>
+      <button 
+        class="tempo-button"
+        onMouseDown=${onTempoPlusDown}
+        onTouchStart=${onTempoPlusDown}
+        onMouseUp=${onTempoButtonUp}
+        onTouchEnd=${onTempoButtonUp}  
+      >
+      +
+      </button>
       </div>
     </div>
   </div>
